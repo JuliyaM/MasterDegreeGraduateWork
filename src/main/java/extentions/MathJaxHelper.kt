@@ -4,7 +4,7 @@ import koma.matrix.Matrix
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
-class MathJaxHelper {
+object MathJaxHelper {
     fun array(array: List<*>, arrayName: String): String =
         StringBuilder()
             .apply {
@@ -47,7 +47,7 @@ class MathJaxHelper {
                         }
                         .joinToString(",") + "]"
                 append("<iframe id=\"$iframeID\"scrolling=\"no\" class=\"playground\" style=\"display: block; float: left;\" width=\"100%\" height=\"${matrix.numRows() * 150}\" src=\"")
-                append("/Users/happydevil/Projects/ServerProj/uliyaMasterdegreeGraduateWork/showMatrix/markov_chain_visualization/index.html#")
+                append("/static/markov_chain_visualization/index.html#")
                 append(
                     URLEncoder.encode(
                         """{"tm":$matrixString}""",
@@ -57,7 +57,7 @@ class MathJaxHelper {
                 append("\"></iframe>")
             }
 
-    fun systeme(equaq: Array<out String>): String =
+    fun systeme(equaq: Iterable<String>): String =
         StringBuilder()
             .apply {
                 append("$$\n")

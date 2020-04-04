@@ -4,6 +4,5 @@ import kotlinx.html.*
 
 
 interface HtmlFragment {
-
-    fun getFragment(): BODY.() -> Unit
+    fun getFragment(): FlowContent.() -> Unit
 }

@@ -14,8 +14,7 @@ fun HEAD.include(vararg headDependencies: HeadDependencies) {
     }
 }
 
-
-fun BODY.include(vararg headDependencies: HtmlFragment) {
+fun FlowContent.include(vararg headDependencies: HtmlFragment) {
     headDependencies.forEach {
         it.getFragment()()
     }

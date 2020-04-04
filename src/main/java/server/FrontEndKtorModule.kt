@@ -15,8 +15,14 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import ktorModuleLibrary.ktorHtmlExtentions.include
+import main.java.MainProcessor
+import main.java.server.controllers.MainPageController
 import main.java.server.controllers.StaticRecursiveRoutingController
 import main.java.server.ktorModuleLibrary.modules.KtorModule
+import processors.repository.MockProcessesProvider
+import processors.repository.MockProjectsProvider
+import processors.repository.MockRiskCauseProvider
+import processors.repository.MockRiskProvider
 
 const val PRODUCTION = false
 
@@ -25,7 +31,40 @@ class FrontEndKtorModule : KtorModule() {
     private val fileProviderFeature = FileProviderFeature()
 
     private val staticRecursiveRoutingController by lazy {
-        StaticRecursiveRoutingController("static", 0, fileProviderFeature.pathToStaticFiles)
+        StaticRecursiveRoutingController(
+            routingPath = "static",
+            minimalPermission = 0,
+            staticFileFolder = fileProviderFeature.pathToStaticFiles
+        )
+    }
+
+    private val mockRiskCauseProvider by lazy {
+        MockRiskCauseProvider()
+    }
+
+    private val mockRiskProvider by lazy {
+        MockRiskProvider(mockRiskCauseProvider)
+    }
+
+    private val mockProcessesProvider by lazy {
+        MockProcessesProvider(mockRiskProvider)
+    }
+
+    private val mockProjectProvider by lazy {
+        MockProjectsProvider(mockProcessesProvider)
+    }
+
+    private val mainProcessor by lazy {
+        MainProcessor()
+    }
+
+    private val mainPageController by lazy {
+        MainPageController(
+            routingPath = "main",
+            minimalPermission = 0,
+            mockProjectProvider = mockProjectProvider,
+            mainProcessor = mainProcessor
+        )
     }
 
     @KtorExperimentalAPI
@@ -45,6 +84,7 @@ class FrontEndKtorModule : KtorModule() {
 
                 routing {
                     include(staticRecursiveRoutingController)
+                    include(mainPageController)
                 }
 
             }

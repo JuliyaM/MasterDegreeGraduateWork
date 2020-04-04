@@ -43,7 +43,7 @@ data class AnalyzedProject(
     val name: String,
     val processes: List<AnalyzedProcess>,
     val startProcessIndex: Int,
-    val endProjectIndex: Int
+    val endProjectIndex: Int?
 ) {
     fun toProjectTransitionsMatrix(): Matrix<Double> {
         return Matrix(processes.count(), processes.count()) { rowIndex, colIndex ->
@@ -51,8 +51,21 @@ data class AnalyzedProject(
         }
     }
 
+    fun getSolveStartInfo(): ProjectSolveStartInfo {
+        val startMatrix = toProjectTransitionsMatrix()
+        val startLabors = processes.filterIndexed { index, _ -> index != endProjectIndex }.map { it.labor }
+        val endProjectIndex = endProjectIndex
+        return ProjectSolveStartInfo(startMatrix, startLabors, endProjectIndex)
+    }
+
     val rpn: Double = processes.sumByDouble { it.rpn }
 }
+
+data class ProjectSolveStartInfo(
+    val startMatrix: Matrix<Double>,
+    val startLabors: List<Int>,
+    val endProjectIndex: Int?
+)
 
 data class DeltaResult(
     val relative: Double,

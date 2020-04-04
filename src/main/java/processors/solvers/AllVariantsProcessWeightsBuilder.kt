@@ -1,4 +1,4 @@
-package processors.solvers
+package main.java.processors.solvers
 
 import extentions.getBinaryDistribution
 import koma.matrix.Matrix
@@ -16,7 +16,7 @@ class AllVariantsProcessWeightsBuilder(
         endRowIndex: Int?
     ): Map<List<Int>, List<Double>> {
         val laborsToWeights =
-            (0 until 2.pow(startLabors.size - 1).toInt())
+            (0 until 2.pow(startLabors.size).toInt())
                 .map { representation ->
                     val laborsRepr = getBinaryDistribution(startLabors.size, representation)
                         .mapIndexed { index, value ->

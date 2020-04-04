@@ -1,7 +1,9 @@
 package extentions
 
 import koma.extensions.forEachIndexed
+import koma.extensions.map
 import koma.extensions.mapIndexed
+import koma.internal.KomaJsName
 import koma.matrix.Matrix
 import koma.ones
 import koma.zeros
@@ -35,6 +37,22 @@ fun Matrix<Double>.diagonalZeros() = mapIndexed { row, col, ele ->
 inline fun <T> Matrix<T>.forEachRowO(f: (rowIndex: Int, row: Matrix<T>) -> Unit) {
     for (row in 0 until this.numRows())
         f(row, this.getRow(row))
+}
+
+inline fun <T> Matrix<T>.mapRowsIndexed(f: (index: Int, row: Matrix<T>) -> Matrix<T>): Matrix<T> {
+    val outRows = Array(this.numRows()) {
+        f(it, this.getRow(it))
+    }
+
+    val out = this.getFactory().zeros(this.numRows(), outRows[0].numCols())
+
+    outRows.forEachIndexed { i, matrix ->
+        if (matrix.numCols() != out.numCols())
+            throw RuntimeException("All output rows of mapRows must have same number of columns")
+        else
+            out.setRow(i, outRows[i])
+    }
+    return out
 }
 
 inline fun <T> Matrix<T>.anyIndexed(crossinline predicate: (rowIndex: Int, colIndex: Int, ele: T) -> Boolean): Boolean {
@@ -128,7 +146,7 @@ public inline fun <T> Iterable<T>.sumByListDouble(selector: (T) -> List<Double>)
     val sum = mutableListOf<Double>()
     for (element in this) {
         val list = selector(element)
-        if(sum.isEmpty()) sum.addAll(list)
+        if (sum.isEmpty()) sum.addAll(list)
         else sum.mutableSumWith(list)
     }
     return sum
@@ -163,3 +181,5 @@ fun MutableList<Double>.mutableSumWith(element: List<Double>) {
         this[index] += d
     }
 }
+
+fun Matrix<Double>.round(decimals: Int): Matrix<Double> = map { it.round(decimals) }

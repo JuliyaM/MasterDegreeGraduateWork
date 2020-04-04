@@ -12,7 +12,7 @@ object MySupportBundle : HeadDependencies {
         {
             include(
                 AjaxJsImpl,
-                GoogleRaleway,
+//                GoogleRaleway,
                 JQueryImpl,
                 ViewPortMetaImpl
             )
@@ -38,6 +38,17 @@ object MyUiKitBundle : HeadDependencies {
                 UiKitCSS,
                 UiKitJsImpl,
                 UiKitIconImpl
+            )
+        }
+}
+
+object MyMathBundle : HeadDependencies {
+    override fun implementation(): HEAD.() -> Unit =
+        {
+            include(
+                PolyfillV3,
+                MathJaxScript,
+                NpmChart
             )
         }
 }
@@ -291,6 +302,31 @@ object UiKitCSS : HeadDependencies {
                 href = "https://cdnjs.cloudflare.com/ajax/libs/uikit/3.1.9/css/uikit.min.css",
                 rel = "stylesheet"
             )
+        }
+    }
+}
+
+object PolyfillV3 : HeadDependencies {
+    override fun implementation(): HEAD.() -> Unit = {
+        script(src = "https://polyfill.io/v3/polyfill.min.js?features=es6") {
+            charset = "utf8"
+        }
+    }
+}
+
+object MathJaxScript : HeadDependencies {
+    override fun implementation(): HEAD.() -> Unit = {
+        script(src = "https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js") {
+            async = true
+            charset = "utf8"
+        }
+    }
+}
+
+object NpmChart : HeadDependencies {
+    override fun implementation(): HEAD.() -> Unit = {
+        script(src = "https://cdn.jsdelivr.net/npm/chart.js@2.8.0") {
+            charset = "utf8"
         }
     }
 }
