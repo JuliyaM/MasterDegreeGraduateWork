@@ -47,8 +47,7 @@ class MathJaxHelper {
                         }
                         .joinToString(",") + "]"
                 append("<iframe id=\"$iframeID\"scrolling=\"no\" class=\"playground\" style=\"display: block; float: left;\" width=\"100%\" height=\"${matrix.numRows() * 150}\" src=\"")
-
-                append("https://setosa.io/markov#")
+                append("/Users/happydevil/Projects/ServerProj/uliyaMasterdegreeGraduateWork/showMatrix/markov_chain_visualization/index.html#")
                 append(
                     URLEncoder.encode(
                         """{"tm":$matrixString}""",

@@ -1,3 +1,5 @@
+package main.java
+
 import extentions.*
 import koma.matrix.Matrix
 import processors.*
@@ -8,7 +10,7 @@ import processors.repository.MockRiskCauseProvider
 import processors.repository.MockRiskProvider
 import processors.solvers.*
 
-class MainModule {
+class MainController {
 
     private val stationaryDistributionProcessor by lazy {
         StationaryDistributionSolver()

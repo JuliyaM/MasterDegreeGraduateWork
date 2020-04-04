@@ -2,7 +2,6 @@ package processors.crono
 
 import AnalyzedProject
 import DeltaResult
-import MainModule
 import RiskCause
 import extentions.*
 import koma.extensions.forEachIndexed
@@ -11,7 +10,6 @@ import koma.matrix.Matrix
 import kotlinx.html.*
 import org.nield.kotlinstatistics.medianBy
 import processors.MathJaxHelper
-import processors.solvers.DifferentialKolmogorovSolver
 import processors.solvers.EndProjectExperimentSolver
 import java.lang.StringBuilder
 import kotlin.math.absoluteValue
@@ -40,17 +38,13 @@ class ExperimentChronicler {
         val startMatrixRound = start.map { it.round(2) }
         outputInfoBuilder.matrix(startMatrixRound, "P".withIndexLatex("start"), "p")
         outputInfoBuilder.array(labors.toList(), "m")
-        outputInfoBuilder.lineBreak()
         outputInfoBuilder.showMarkovMatrix(startMatrixRound)
-        outputInfoBuilder.lineBreak()
         outputInfoBuilder.text("Из этого была построена матрица проекта:")
 
         printAlgorithmProjectBuild(startMatrixRound, labors, endRowIndex)
 
         outputInfoBuilder.matrix(projectMatrix.map { it.round(2) }, "P", "p")
-        outputInfoBuilder.lineBreak()
         outputInfoBuilder.showMarkovMatrix(projectMatrix)
-        outputInfoBuilder.lineBreak()
         outputInfoBuilder.text("Для анализа рисков в данном проекте нам необходимо оценить относительное количество времени проведенное в каждом процессе, что будет соответсвовать весам процессов.")
         outputInfoBuilder.text("Для этого мы можем использовать дифференциальные уравнения Колмогорова.")
         printADifferentalKolmogorovAlgorithm(projectMatrix, outputInfoBuilder)
@@ -124,9 +118,7 @@ class ExperimentChronicler {
 
         outputInfoBuilder.text("Данную матрицу необходимо нормировать:")
         outputInfoBuilder.matrix(normalizedP1.map { it.round(2) }, "P1".withIndexLatex("normalized"), "p")
-        outputInfoBuilder.lineBreak()
         outputInfoBuilder.showMarkovMatrix(normalizedP1)
-        outputInfoBuilder.lineBreak()
         printADifferentalKolmogorovAlgorithm(normalizedP1, outputInfoBuilder)
 
         outputInfoBuilder.text("Решим полученную систему:")

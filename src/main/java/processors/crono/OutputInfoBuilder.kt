@@ -9,27 +9,8 @@ import kotlin.random.Random
 
 class OutputInfoBuilder(private val mathJaxHelper: MathJaxHelper) {
     private val innerStringBuilder = StringBuilder()
-    private val iframeIDs = mutableListOf<String>()
     fun clear() = innerStringBuilder.clear()
-    fun print() = innerStringBuilder.apply {
-        append("<script>\n")
-        append("window.onload = function() {\n")
-        iframeIDs.forEach {
-            append("clearBackgroundIframe(\"$it\")\n")
-        }
-        append("}\n")
-        append(
-            """
-            function clearBackgroundIframe(iframeID) {
-                  let myiFrame = document.getElementById(iframeID);
-                  let doc = myiFrame.contentDocument;
-                  doc.head.innerHTML = doc.head.innerHTML + '<style> body { background-color:white }</style>';
-                }
-                
-        """.trimIndent()
-        )
-        append("</script>\n")
-    }.toString()
+    fun print() = innerStringBuilder.toString()
 
     fun lineBreak() {
         innerStringBuilder
@@ -63,10 +44,13 @@ class OutputInfoBuilder(private val mathJaxHelper: MathJaxHelper) {
 
     fun showMarkovMatrix(matrix: Matrix<*>) {
         val iframeID = "iframe${Random.nextInt(100000)}"
-        iframeIDs.add(iframeID)
+        lineBreak()
+        text("")
         innerStringBuilder
             .append(mathJaxHelper.showMarkovMatrix(matrix, iframeID))
             .append("\n")
+        text("")
+        lineBreak()
     }
 
     fun table(init: TABLE.() -> Unit) {
