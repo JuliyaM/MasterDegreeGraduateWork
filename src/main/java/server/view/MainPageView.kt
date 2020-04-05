@@ -43,14 +43,20 @@ class MainPageView(
                                 include(
                                     WithoutEndAlgorithmFragment(
                                         projectMatrix = projectMatrix,
-                                        withoutEndProjectProcessesWeights = withoutEndProjectProcessesWeights
+                                        withoutEndProcessWeightSolveResult = withoutEndProcessWeightSolveResult
                                     )
                                 )
 
-                                if (projectWithEndProcessWeights != null)
-                                    include(ProjectWithEndFingWeightsAlgorithmFragment(projectWithEndProcessWeights))
+                                if (withEndProcessWeightSolveResult != null)
+                                    include(ProjectWithEndFingWeightsAlgorithmFragment(
+                                        project = project,
+                                        withEndProcessWeightSolveResult = withEndProcessWeightSolveResult
+                                    ))
 
-                                include(ChoseOneWeightAlgorithmFragment(project, laborsToWeights))
+                                include(ChoseOneWeightAlgorithmFragment(
+                                    project = project,
+                                    projectsVariants = projectsVariants
+                                ))
 
                                 include(ResultProjectAnalyzeFragment(projectsVariants))
                             }

@@ -1,9 +1,8 @@
 package main.java.server.view.fragments
 
-import extentions.round
-import extentions.withIndexLatex
+import main.java.extentions.round
+import main.java.extentions.withIndexLatex
 import koma.matrix.Matrix
-import kotlinx.html.BODY
 import kotlinx.html.FlowContent
 import kotlinx.html.p
 import main.java.extentions.systemeTag

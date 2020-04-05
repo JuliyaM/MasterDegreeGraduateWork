@@ -1,8 +1,7 @@
 package main.java.server.view.fragments
 
-import extentions.round
-import extentions.withIndexLatex
-import koma.extensions.map
+import main.java.extentions.round
+import main.java.extentions.withIndexLatex
 import koma.matrix.Matrix
 import kotlinx.html.*
 import kotlinx.html.p
@@ -10,7 +9,6 @@ import main.java.extentions.arrayTag
 import main.java.extentions.markovChainTag
 import main.java.extentions.matrixTag
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
-import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
 
 class StartInfoFragment(
     private val startMatrix: Matrix<Double>,

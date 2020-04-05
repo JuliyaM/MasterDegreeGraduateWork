@@ -1,13 +1,13 @@
 package processors.solvers
 
 import MatrixWalker
-import extentions.averageResult
+import main.java.extentions.averageResult
 import koma.matrix.Matrix
 
 class EndProjectExperimentSolver {
 
     data class ExperimentResult(
-        val startState: Int,
+        val startIndex: Int,
         val averageResult: List<Double>,
         val averageDayCount: Double
     )

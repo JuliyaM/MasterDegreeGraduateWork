@@ -1,7 +1,7 @@
 package processors.solvers
 
-import extentions.onesRow
-import extentions.zerosWithOneIn
+import main.java.extentions.onesRow
+import main.java.extentions.zerosWithOneIn
 import koma.eye
 import koma.matrix.Matrix
 

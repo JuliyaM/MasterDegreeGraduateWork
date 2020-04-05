@@ -1,8 +1,8 @@
 package processors.solvers
 
-import extentions.diagonalZeros
-import extentions.onesRow
-import extentions.zerosWithOneIn
+import main.java.extentions.diagonalZeros
+import main.java.extentions.onesRow
+import main.java.extentions.zerosWithOneIn
 import koma.extensions.mapIndexed
 import koma.matrix.Matrix
 

@@ -2,9 +2,6 @@ package main.java.extentions
 
 import AnalyzedProject
 import RiskCause
-import extentions.mapRowsIndexed
-import extentions.round
-import extentions.zerosWithOneIn
 import koma.extensions.map
 import koma.matrix.Matrix
 import kotlinx.html.*
@@ -54,7 +51,7 @@ fun FlowContent.chartTag(labels: List<Any>, colorLabelDatas: List<Triple<String,
             
                   // The data for our dataset
                   data: {
-                    labels: [${labels.joinToString(", ")}],
+                    labels: [${labels.joinToString(", ") { "\"$it\"" }}],
                     datasets: [
                     ${
             colorLabelDatas.joinToString(",\n") { colorLabelData ->
@@ -98,7 +95,7 @@ fun FlowContent.markovChainTag(matrix: Matrix<Double>, matrixName: String = Rand
         attributes["scrolling"] = "no"
         style = "display: block; float: left;"
         width = "100%"
-        height = (matrix.numRows() * 150).toString()
+        height = (matrix.numRows() * 100).toString()
         src = "/static/markov_chain_visualization/index.html#$matrixJson"
     }
     p { +"Матрица $matrixName" }

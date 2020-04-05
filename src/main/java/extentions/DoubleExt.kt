@@ -1,9 +1,8 @@
-package extentions
+package main.java.extentions
 
 import koma.extensions.forEachIndexed
 import koma.extensions.map
 import koma.extensions.mapIndexed
-import koma.internal.KomaJsName
 import koma.matrix.Matrix
 import koma.ones
 import koma.zeros

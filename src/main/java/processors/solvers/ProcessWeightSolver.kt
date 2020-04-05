@@ -2,8 +2,8 @@ package main.java.processors.solvers
 
 import AnalyzedProject
 import DeltaResult
-import extentions.average
-import extentions.averageResult
+import main.java.extentions.average
+import main.java.extentions.averageResult
 import koma.extensions.map
 import koma.matrix.Matrix
 import processors.solvers.AvgExperimentSolver
@@ -85,7 +85,7 @@ class ProcessWeightSolver(
             endProjectExperimentSolver.solve(projectMatrix, endProjectExpCount, endProjectIndex)
 
         val endProjectResultListAverage = EndProjectExperimentSolver.ExperimentResult(
-            startState = -1,
+            startIndex = -1,
             averageResult = endProjectResultList.map { it.averageResult }.averageResult(),
             averageDayCount = endProjectResultList.average { it.averageDayCount }
         )

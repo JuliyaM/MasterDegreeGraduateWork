@@ -1,7 +1,7 @@
 package main.java.server.view.fragments
 
 import AnalyzedProject
-import extentions.round
+import main.java.extentions.round
 import kotlinx.html.*
 import main.java.extentions.arrayTag
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
@@ -10,12 +10,9 @@ import processors.MathJaxHelper
 
 class ChoseOneWeightAlgorithmFragment(
     private val project: AnalyzedProject,
-    private val laborsToWeights: Map<List<Int>, List<Double>>
+    private val projectsVariants: List<AnalyzedProject>
 ) : HtmlFragment {
     override fun getFragment(): FlowContent.() -> Unit = {
-        val labors = laborsToWeights.keys.toList()
-        val weights = laborsToWeights.values.toList()
-
         p {
             +"""
                 Произведем дальнейшие расчеты для начального процесса ${project.startProcessIndex}. Опираясь на работу Полячека, 
@@ -41,17 +38,17 @@ class ChoseOneWeightAlgorithmFragment(
                 tr {
                     th { +"#" }
                     th { +"Трудоемкости" }
-                    weights.first().forEachIndexed { index, _ ->
-                        th { +"Состояние $index" }
-                    }
+                    projectsVariants.first().processes.forEach { th { +"Вес процесса ${it.name}" } }
                 }
             },
             tBody = {
-                weights.forEachIndexed { index, weight ->
+                projectsVariants.forEachIndexed { index, project ->
                     tr {
+                        val labors = project.processes.map { it.labor }
+                        val weights = project.processes.map { it.weight }
                         td { +index.toString() }
-                        td { arrayTag(labors[index].toList(), "m") }
-                        weight.forEach {
+                        td { arrayTag(labors, "m") }
+                        weights.forEach {
                             td { +"${it.round(2)}" }
                         }
                     }

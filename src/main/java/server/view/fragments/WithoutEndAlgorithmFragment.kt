@@ -1,9 +1,8 @@
 package main.java.server.view.fragments
 
-import extentions.round
-import extentions.withIndexLatex
+import main.java.extentions.round
+import main.java.extentions.withIndexLatex
 import koma.matrix.Matrix
-import kotlinx.html.BODY
 import kotlinx.html.FlowContent
 import kotlinx.html.p
 import main.java.extentions.arrayTag
@@ -13,7 +12,7 @@ import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
 
 class WithoutEndAlgorithmFragment(
     private val projectMatrix: Matrix<Double>,
-    private val withoutEndProjectProcessesWeights: WithoutEndProcessWeightSolveResult
+    private val withoutEndProcessWeightSolveResult: WithoutEndProcessWeightSolveResult
 ) : HtmlFragment {
     override fun getFragment(): FlowContent.() -> Unit = {
         p {
@@ -25,7 +24,7 @@ class WithoutEndAlgorithmFragment(
         include(DifferentalKolmogorovAlgorithmFragment(projectMatrix))
         p { +"Решим полученную систему:" }
 
-        with(withoutEndProjectProcessesWeights) {
+        with(withoutEndProcessWeightSolveResult) {
             arrayTag(projectDiffKolmogorovResult.round(2), "q")
             p {
                 +"""Для проверки результатов проведем эксперемент: будем совершать переходы в системе $avgExpSteps раз 

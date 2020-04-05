@@ -68,22 +68,31 @@ class MainProcessor {
             )
 
 
-        val projectsVariants = laborsToWeights.map { (labor, weight) ->
-            randomProject.copy(
-                processes = randomProject.processes.mapIndexed { index, analyzedProcess ->
-                    analyzedProcess.copy(
-                        labor = labor.getOrNull(index) ?: 0,
-                        weight = weight.getOrNull(index) ?: 0.0
+        val processesWithoutEnd =
+            if (endProjectIndex != null) randomProject.processes.toMutableList().apply { removeAt(endProjectIndex) }
+            else randomProject.processes
+
+        val projectsVariants =
+            laborsToWeights
+                .map { (labor, weight) ->
+                    randomProject.copy(
+                        processes = processesWithoutEnd.mapIndexed { index, analyzedProcess ->
+                            analyzedProcess.copy(
+                                labor = labor.getOrNull(index) ?: 0,
+                                weight = weight.getOrNull(index) ?: 0.0
+                            )
+                        }
                     )
                 }
-            )
-        }
+                .sortedBy {
+                    it.rpn
+                }
+
 
         return ProjectAnalyzeResult(
             projectMatrix = projectMatrix,
-            withoutEndProjectProcessesWeights = withoutEndProjectProcessesWeights,
-            projectWithEndProcessWeights = projectWithEndProcessWeights,
-            laborsToWeights = laborsToWeights,
+            withoutEndProcessWeightSolveResult = withoutEndProjectProcessesWeights,
+            withEndProcessWeightSolveResult = projectWithEndProcessWeights,
             projectsVariants = projectsVariants
         )
     }
@@ -92,8 +101,7 @@ class MainProcessor {
 
 data class ProjectAnalyzeResult(
     val projectMatrix: Matrix<Double>,
-    val withoutEndProjectProcessesWeights: WithoutEndProcessWeightSolveResult,
-    val projectWithEndProcessWeights: WithEndProcessWeightSolveResult?,
-    val laborsToWeights: Map<List<Int>, List<Double>>,
+    val withoutEndProcessWeightSolveResult: WithoutEndProcessWeightSolveResult,
+    val withEndProcessWeightSolveResult: WithEndProcessWeightSolveResult?,
     val projectsVariants: List<AnalyzedProject>
 )

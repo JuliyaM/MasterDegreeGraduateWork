@@ -1,8 +1,9 @@
 package main.java.server.view.fragments
 
-import extentions.powLatex
-import extentions.round
-import extentions.withIndexLatex
+import AnalyzedProject
+import main.java.extentions.powLatex
+import main.java.extentions.round
+import main.java.extentions.withIndexLatex
 import kotlinx.html.*
 import main.java.extentions.arrayTag
 import main.java.extentions.markovChainTag
@@ -13,6 +14,7 @@ import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
 import kotlin.math.absoluteValue
 
 class ProjectWithEndFingWeightsAlgorithmFragment(
+    private val project: AnalyzedProject,
     private val withEndProcessWeightSolveResult: WithEndProcessWeightSolveResult
 ) : HtmlFragment {
     override fun getFragment(): FlowContent.() -> Unit = {
@@ -35,14 +37,14 @@ class ProjectWithEndFingWeightsAlgorithmFragment(
                         th { +"" }
                         th { +"Среднее время проекта" }
                         endProjectResultList.first().averageResult.forEachIndexed { index, _ ->
-                            th { +"Состояние $index" }
+                            th { +"Вес процесса ${project.processes[index].name}" }
                         }
                     }
                 },
                 tBody = {
                     endProjectResultList.forEach {
                         tr {
-                            td { +"Начальное состояние ${it.startState}" }
+                            td { +"Начало в процессе ${project.processes[it.startIndex].name}" }
                             td { +it.averageDayCount.round(2).toString() }
                             it.averageResult.forEach {
                                 td { +it.round(2).toString() }
@@ -94,14 +96,14 @@ class ProjectWithEndFingWeightsAlgorithmFragment(
                         th { +"" }
                         th { +"Матрица" }
                         endProjectResultList.first().averageResult.forEachIndexed { index, _ ->
-                            th { +"Состояние $index" }
+                            th { +"Вес процесса ${project.processes[index].name}" }
                         }
                     }
                 },
                 tBody = {
                     multiKolmogorovResult.forEachIndexed { index, (Pi, resultI) ->
                         tr {
-                            td { +"Начальное состояние $index" }
+                            td { +"Начало в процессе ${project.processes[index].name}" }
                             td { matrixTag(Pi.round(2), "", "p") }
                             resultI
                                 .map { it.absoluteValue.round(2).toString() }
@@ -124,14 +126,14 @@ class ProjectWithEndFingWeightsAlgorithmFragment(
                     tr {
                         th { +"" }
                         endProjectToKolmogorovDelta.first().forEachIndexed { index, _ ->
-                            th { +"Состояние $index" }
+                            th { +"Вес процесса ${project.processes[index].name}" }
                         }
                     }
                 },
                 tBody = {
                     endProjectToKolmogorovDelta.forEachIndexed { index, deltaResult ->
                         tr {
-                            td { +"Начальное состояние $index" }
+                            td { +"Начало в процессе ${project.processes[index].name}" }
                             deltaResult
                                 .forEach {
                                     td { +"${it.absolute.round(2)}" }

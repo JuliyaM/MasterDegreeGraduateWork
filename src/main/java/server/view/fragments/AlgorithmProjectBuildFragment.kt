@@ -1,10 +1,10 @@
 package main.java.server.view.fragments
 
 import AnalyzedProject
-import extentions.LS
-import extentions.frac
-import extentions.round
-import extentions.withIndexLatex
+import main.java.extentions.LS
+import main.java.extentions.frac
+import main.java.extentions.round
+import main.java.extentions.withIndexLatex
 import koma.extensions.forEachIndexed
 import koma.matrix.Matrix
 import kotlinx.html.FlowContent

@@ -1,6 +1,6 @@
 package main.java.processors.solvers
 
-import extentions.getBinaryDistribution
+import main.java.extentions.getBinaryDistribution
 import koma.matrix.Matrix
 import koma.pow
 import processors.ProjectLifecycleBuilder
