@@ -1,8 +1,10 @@
 package main.java.server.view
 
 import AnalyzedProject
+import Solution
 import kotlinx.html.*
-import main.java.ProjectAnalyzeResult
+import main.java.processors.ProjectAnalyzeResult
+import main.java.processors.SolutionsAnalyzer
 import main.java.server.MyMathBundle
 import main.java.server.MyUiKitBundle
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlView
@@ -11,7 +13,8 @@ import main.java.server.view.fragments.*
 
 class MainPageView(
     private val project: AnalyzedProject,
-    private val projectAnalyzeResult: ProjectAnalyzeResult
+    private val projectAnalyzeResult: ProjectAnalyzeResult,
+    private val solutions: List<Solution>
 ) : HtmlView() {
 
     override fun getHTML(): HTML.() -> Unit =
@@ -59,6 +62,8 @@ class MainPageView(
                                 ))
 
                                 include(ResultProjectAnalyzeFragment(projectsVariants))
+
+                                include(SolutionsFragment(solutions))
                             }
                         }
                     }

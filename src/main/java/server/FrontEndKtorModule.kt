@@ -15,14 +15,15 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import ktorModuleLibrary.ktorHtmlExtentions.include
-import main.java.MainProcessor
+import main.java.processors.ProjectAnalyzer
+import main.java.processors.SolutionsAnalyzer
 import main.java.server.controllers.MainPageController
 import main.java.server.controllers.StaticRecursiveRoutingController
 import main.java.server.ktorModuleLibrary.modules.KtorModule
 import processors.repository.MockProcessesProvider
 import processors.repository.MockProjectsProvider
 import processors.repository.MockRiskCauseProvider
-import processors.repository.MockRiskProvider
+import main.java.processors.repository.MockRiskProvider
 
 const val PRODUCTION = false
 
@@ -54,8 +55,12 @@ class FrontEndKtorModule : KtorModule() {
         MockProjectsProvider(mockProcessesProvider)
     }
 
-    private val mainProcessor by lazy {
-        MainProcessor()
+    private val projectAnalyzer by lazy {
+        ProjectAnalyzer()
+    }
+
+    private val solutionsAnalyzer by lazy {
+        SolutionsAnalyzer()
     }
 
     private val mainPageController by lazy {
@@ -63,7 +68,8 @@ class FrontEndKtorModule : KtorModule() {
             routingPath = "main",
             minimalPermission = 0,
             mockProjectProvider = mockProjectProvider,
-            mainProcessor = mainProcessor
+            projectAnalyzer = projectAnalyzer,
+            solutionsAnalyzer = solutionsAnalyzer
         )
     }
 

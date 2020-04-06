@@ -12,18 +12,6 @@ class ResultProjectAnalyzeFragment(
     private val projectsVariants: List<AnalyzedProject>
 ) : HtmlFragment {
 
-    private val colors = listOf(
-        "#E0BBE4",
-        "#957DAD",
-        "#D291BC",
-        "#FEC8D8",
-        "#FFDFD3",
-        "#F2CDE3",
-        "#FFCBA3",
-        "#C8E0CF",
-        "#FEE3EE"
-    ).shuffled()
-
     override fun getFragment(): FlowContent.() -> Unit = {
         p {
             +"""У нас получилось ${projectsVariants.count()} возможных реализаци проекта. Т.к. риски статичны относительно всех 
@@ -43,6 +31,7 @@ class ResultProjectAnalyzeFragment(
                     th { +"Вероятность появления" }
                     th { +"Вероятность обнаружения" }
                     th { +"Значимость" }
+                    th { +"Стоимость решения" }
                 }
             },
             tBody = {
@@ -179,11 +168,10 @@ class ResultProjectAnalyzeFragment(
         val processVariants = projectsVariants.map { it.processes }
         val transposeProcesses = processVariants.transpose()
 
-        LoggerHelper.log(transposeProcesses.toString())
         chartTag(
             labels = transposeProcesses.first().indices.map { it.toString() },
             colorLabelDatas = transposeProcesses.mapIndexed { index, processVariant ->
-                Triple(colors[index.rem(colors.size)], processVariant.first().name, processVariant.map { it.rpn })
+                Triple(chartColors[index.rem(chartColors.size)], processVariant.first().name, processVariant.map { it.rpn })
             }
         )
     }

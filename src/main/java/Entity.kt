@@ -5,6 +5,7 @@ data class RiskCause(
     val probability: Double,
     val detectability: Double,
     val significance: Int,
+    val solutionCost: Double,
     val weight: Double
 ) {
     val rpn: Double = detectability * probability * significance * weight
@@ -71,3 +72,12 @@ data class DeltaResult(
     val relative: Double,
     val absolute: Double
 )
+
+data class Solution(
+    val process: AnalyzedProcess,
+    val risk: Risk,
+    val riskCause: RiskCause
+) {
+    val removedRpn: Double = (riskCause.rpn * risk.weight * process.weight)
+    val solutionEfficient: Double = removedRpn / riskCause.solutionCost
+}

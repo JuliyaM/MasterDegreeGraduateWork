@@ -1,4 +1,4 @@
-package main.java
+package main.java.processors
 
 import AnalyzedProject
 import koma.matrix.Matrix
@@ -9,7 +9,7 @@ import main.java.processors.solvers.WithoutEndProcessWeightSolveResult
 import processors.*
 import processors.solvers.*
 
-class MainProcessor {
+class ProjectAnalyzer {
     private val projectLifecycleBuilder by lazy {
         ProjectLifecycleBuilder()
     }

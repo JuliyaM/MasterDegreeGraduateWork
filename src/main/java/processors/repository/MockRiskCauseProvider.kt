@@ -18,6 +18,7 @@ class MockRiskCauseProvider {
             probability = Random.nextDouble(),
             detectability = Random.nextDouble(),
             significance = Random.nextInt(11),
-            weight = Random.nextDouble()
+            weight = Random.nextDouble(),
+            solutionCost = Random.nextDouble()
         )
 }

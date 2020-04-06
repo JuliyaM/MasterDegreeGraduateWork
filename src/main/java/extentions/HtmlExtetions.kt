@@ -36,6 +36,19 @@ fun FlowContent.systemeTag(equaq: Iterable<String>) {
     }
 }
 
+val chartColors = listOf(
+    "#E0BBE4",
+    "#957DAD",
+    "#D291BC",
+    "#FEC8D8",
+    "#FFDFD3",
+    "#F2CDE3",
+    "#FFCBA3",
+    "#C8E0CF",
+    "#FEE3EE"
+).shuffled()
+
+
 fun FlowContent.chartTag(labels: List<Any>, colorLabelDatas: List<Triple<String, String, List<Double>>>) {
     val chardID = "myChart${Random.nextInt(100000)}"
 
@@ -76,10 +89,10 @@ fun FlowContent.chartTag(labels: List<Any>, colorLabelDatas: List<Triple<String,
 fun FlowContent.markovChainTag(matrix: Matrix<Double>, matrixName: String = Random.nextInt(10000).toString()) {
     val iframeID = "iframe$matrixName"
     val matrixRows = matrix
-        .mapRowsIndexed { index,row ->
+        .mapRowsIndexed { index, row ->
             val elementSum = row.elementSum()
-            when{
-                elementSum == 0.0 -> zerosWithOneIn(row.numCols(),index).transpose()
+            when {
+                elementSum == 0.0 -> zerosWithOneIn(row.numCols(), index).transpose()
                 elementSum != 1.0 -> row.map { it / elementSum }
                 else -> row
             }
@@ -154,5 +167,8 @@ fun TR.riskCause(riskCause: RiskCause) {
     }
     td {
         +riskCause.significance.toString()
+    }
+    td {
+        +riskCause.solutionCost.round(2).toString()
     }
 }
