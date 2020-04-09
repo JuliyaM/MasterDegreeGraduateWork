@@ -4,8 +4,10 @@ import AnalyzedProject
 import main.java.extentions.round
 import kotlinx.html.*
 import main.java.extentions.arrayTag
+import main.java.extentions.transpose
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
+import org.nield.kotlinstatistics.median
 import processors.MathJaxHelper
 
 class ChoseOneWeightAlgorithmFragment(
@@ -51,6 +53,30 @@ class ChoseOneWeightAlgorithmFragment(
                         weights.forEach {
                             td { +"${it.round(2)}" }
                         }
+                    }
+                }
+            },
+            tFoot = {
+                val projectWeights = projectsVariants.map { analyzedProject ->
+                    analyzedProject.processes.map { analyzedProcess -> analyzedProcess.weight }
+                }
+                    .transpose()
+                tr {
+                    td {
+                        colSpan = "2"
+                        +"Максимальное значение"
+                    }
+                    projectWeights.map { it.max() ?: 0.0 }.forEach {
+                        td { +"${it.round(2)}" }
+                    }
+                }
+                tr {
+                    td {
+                        colSpan = "2"
+                        +"Среднее значение"
+                    }
+                    projectWeights.map { it.average() }.forEach {
+                        td { +"${it.round(2)}" }
                     }
                 }
             }

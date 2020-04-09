@@ -1,15 +1,16 @@
 package main.java.processors
 
 import AnalyzedProject
-import Solution
+import OneRiskCauseSolution
+import OneRiskSolution
 
 class SolutionsAnalyzer {
-    fun getSolutions(project: AnalyzedProject): List<Solution> {
-        val solutions = project.processes
+    fun getSolutions(project: AnalyzedProject): Pair<List<OneRiskCauseSolution>, List<OneRiskSolution>> {
+        val riskCauseSolutions = project.processes
             .map { process ->
                 process.risks.map { risk ->
                     risk.riskCauses.map {
-                        Solution(process, risk, it)
+                        OneRiskCauseSolution(process, risk, it)
                     }
                 }.flatten()
             }
@@ -18,6 +19,15 @@ class SolutionsAnalyzer {
                 it.solutionEfficient
             }
 
-        return solutions
+        val riskSolutions = project.processes
+            .map { process ->
+                process.risks.map { risk -> OneRiskSolution(process, risk) }
+            }
+            .flatten()
+            .sortedBy {
+                it.solutionEfficient
+            }
+
+        return riskCauseSolutions to riskSolutions
     }
 }

@@ -1,10 +1,12 @@
 package main.java.server.view
 
 import AnalyzedProject
-import Solution
+import AverageRiskSolution
+import OneRiskSolution
+import RiskCauseSolution
+import RiskSolution
 import kotlinx.html.*
 import main.java.processors.ProjectAnalyzeResult
-import main.java.processors.SolutionsAnalyzer
 import main.java.server.MyMathBundle
 import main.java.server.MyUiKitBundle
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlView
@@ -14,7 +16,8 @@ import main.java.server.view.fragments.*
 class MainPageView(
     private val project: AnalyzedProject,
     private val projectAnalyzeResult: ProjectAnalyzeResult,
-    private val solutions: List<Solution>
+    private val maxProjectRiskSolutions: List<OneRiskSolution>,
+    private val averageRiskSolutions: List<AverageRiskSolution>
 ) : HtmlView() {
 
     override fun getHTML(): HTML.() -> Unit =
@@ -38,7 +41,7 @@ class MainPageView(
                                     +"Документация"
                                 }
                                 p(classes = "uk-text-lead") {
-                                    + "Использования алгоритма анализа RPN проекта"
+                                    +"Использования алгоритма анализа RPN проекта"
                                 }
                             }
                             with(projectAnalyzeResult) {
@@ -51,19 +54,31 @@ class MainPageView(
                                 )
 
                                 if (withEndProcessWeightSolveResult != null)
-                                    include(ProjectWithEndFingWeightsAlgorithmFragment(
-                                        project = project,
-                                        withEndProcessWeightSolveResult = withEndProcessWeightSolveResult
-                                    ))
+                                    include(
+                                        ProjectWithEndFingWeightsAlgorithmFragment(
+                                            project = project,
+                                            withEndProcessWeightSolveResult = withEndProcessWeightSolveResult
+                                        )
+                                    )
 
-                                include(ChoseOneWeightAlgorithmFragment(
-                                    project = project,
-                                    projectsVariants = projectsVariants
-                                ))
+                                include(
+                                    ChoseOneWeightAlgorithmFragment(
+                                        project = project,
+                                        projectsVariants = projectsVariants
+                                    )
+                                )
 
                                 include(ResultProjectAnalyzeFragment(projectsVariants))
 
-                                include(SolutionsFragment(solutions))
+                                p {
+                                    +"""Для выбора путей решений возьмем последнюю вариацию проекта с максимальным RPN. 
+                                        Расммотрим возможные решения каждого из рисков:"""
+                                }
+                                include(RiskSolutionsFragment(maxProjectRiskSolutions))
+                                p {
+                                    +"""Рассмотрим среднее значение решений для всех вариаций проекта:"""
+                                }
+                                include(RiskSolutionsFragment(averageRiskSolutions))
                             }
                         }
                     }

@@ -17,6 +17,7 @@ data class Risk(
     val riskCauses: List<RiskCause>
 ) {
     val rpn: Double = riskCauses.sumByDouble { it.rpn } * weight
+    val solutionCost: Double = riskCauses.sumByDouble { it.solutionCost }
 }
 
 data class AnalyzedProcess(
@@ -73,11 +74,61 @@ data class DeltaResult(
     val absolute: Double
 )
 
-data class Solution(
-    val process: AnalyzedProcess,
-    val risk: Risk,
+interface Solution {
+    val removedRpn: Double
+    val solutionCost: Double
+    val solutionEfficient: Double
+}
+
+interface RiskCauseSolution {
+    val process: AnalyzedProcess
+    val risk: Risk
     val riskCause: RiskCause
-) {
-    val removedRpn: Double = (riskCause.rpn * risk.weight * process.weight)
-    val solutionEfficient: Double = removedRpn / riskCause.solutionCost
+    val removedRpn: Double
+    val solutionCost: Double
+    val solutionEfficient: Double
+}
+
+interface RiskSolution {
+    val process: AnalyzedProcess
+    val risk: Risk
+    val removedRpn: Double
+    val solutionCost: Double
+    val solutionEfficient: Double
+}
+
+data class OneRiskCauseSolution(
+    override val process: AnalyzedProcess,
+    override val risk: Risk,
+    override val riskCause: RiskCause
+) : RiskCauseSolution {
+    override val removedRpn: Double = (riskCause.rpn * risk.weight * process.weight)
+    override val solutionCost: Double = riskCause.solutionCost
+    override val solutionEfficient: Double = removedRpn / riskCause.solutionCost
+}
+
+data class OneRiskSolution(
+    override val process: AnalyzedProcess,
+    override val risk: Risk
+) : RiskSolution {
+    override val removedRpn: Double = (risk.rpn * process.weight)
+    override val solutionCost: Double = risk.solutionCost
+    override val solutionEfficient: Double = removedRpn / risk.solutionCost
+}
+
+class AverageRiskCauseSolution(riskCauseSolutions: List<OneRiskCauseSolution>) : RiskCauseSolution {
+    override val process: AnalyzedProcess = riskCauseSolutions.first().process
+    override val risk: Risk = riskCauseSolutions.first().risk
+    override val riskCause: RiskCause = riskCauseSolutions.first().riskCause
+    override val removedRpn: Double = riskCauseSolutions.sumByDouble { it.removedRpn }
+    override val solutionCost: Double = riskCauseSolutions.sumByDouble { it.solutionCost }
+    override val solutionEfficient: Double = riskCauseSolutions.sumByDouble { it.solutionEfficient }
+}
+
+class AverageRiskSolution(riskSolutions: List<OneRiskSolution>) : RiskSolution {
+    override val process: AnalyzedProcess = riskSolutions.first().process
+    override val risk: Risk = riskSolutions.first().risk
+    override val removedRpn: Double = riskSolutions.sumByDouble { it.removedRpn / riskSolutions.count() }
+    override val solutionCost: Double = riskSolutions.sumByDouble { it.solutionCost / riskSolutions.count() }
+    override val solutionEfficient: Double = riskSolutions.sumByDouble { it.solutionEfficient / riskSolutions.count() }
 }
