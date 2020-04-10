@@ -1,4 +1,4 @@
-package processors
+package main.java.processors
 
 import koma.extensions.mapIndexed
 import koma.matrix.Matrix

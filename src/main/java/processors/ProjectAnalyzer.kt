@@ -6,7 +6,6 @@ import main.java.processors.solvers.AllVariantsProcessWeightsBuilder
 import main.java.processors.solvers.ProcessWeightSolver
 import main.java.processors.solvers.WithEndProcessWeightSolveResult
 import main.java.processors.solvers.WithoutEndProcessWeightSolveResult
-import processors.*
 import processors.solvers.*
 
 class ProjectAnalyzer {

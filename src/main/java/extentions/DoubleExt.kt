@@ -182,3 +182,11 @@ fun MutableList<Double>.mutableSumWith(element: List<Double>) {
 }
 
 fun Matrix<Double>.round(decimals: Int): Matrix<Double> = map { it.round(decimals) }
+
+fun <T, R> Iterable<T>.reductions(initial: R, operation: (acc: R, T) -> R) : Sequence<R> = sequence {
+    var last = initial
+    forEach {
+        last = operation(last, it)
+        yield(last)
+    }
+}

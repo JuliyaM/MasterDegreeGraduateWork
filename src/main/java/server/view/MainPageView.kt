@@ -3,8 +3,8 @@ package main.java.server.view
 import AnalyzedProject
 import AverageRiskSolution
 import OneRiskSolution
-import RiskCauseSolution
-import RiskSolution
+import RpnSolutionEfficientProps
+import SequentialAnalysisOfWaldResult
 import kotlinx.html.*
 import main.java.processors.ProjectAnalyzeResult
 import main.java.server.MyMathBundle
@@ -17,7 +17,9 @@ class MainPageView(
     private val project: AnalyzedProject,
     private val projectAnalyzeResult: ProjectAnalyzeResult,
     private val maxProjectRiskSolutions: List<OneRiskSolution>,
-    private val averageRiskSolutions: List<AverageRiskSolution>
+    private val averageRiskSolutions: List<AverageRiskSolution>,
+    private val waldResults: List<SequentialAnalysisOfWaldResult>,
+    private val rpnSolutionEfficientProps: RpnSolutionEfficientProps
 ) : HtmlView() {
 
     override fun getHTML(): HTML.() -> Unit =
@@ -79,6 +81,13 @@ class MainPageView(
                                     +"""Рассмотрим среднее значение решений для всех вариаций проекта:"""
                                 }
                                 include(RiskSolutionsFragment(averageRiskSolutions))
+
+                                p {
+                                    +"""
+                                    """.trimIndent()
+                                }
+
+                                include(SequentialAnalysisOfWaldFragment(waldResults))
                             }
                         }
                     }

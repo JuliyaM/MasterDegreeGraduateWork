@@ -16,6 +16,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import ktorModuleLibrary.ktorHtmlExtentions.include
 import main.java.processors.ProjectAnalyzer
+import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
 import main.java.server.controllers.MainPageController
 import main.java.server.controllers.StaticRecursiveRoutingController
@@ -63,13 +64,18 @@ class FrontEndKtorModule : KtorModule() {
         SolutionsAnalyzer()
     }
 
+    private val sequentialAnalysisOfWaldProcessor by lazy {
+        SequentialAnalysisOfWaldProcessor()
+    }
+
     private val mainPageController by lazy {
         MainPageController(
             routingPath = "main",
             minimalPermission = 0,
             mockProjectProvider = mockProjectProvider,
             projectAnalyzer = projectAnalyzer,
-            solutionsAnalyzer = solutionsAnalyzer
+            solutionsAnalyzer = solutionsAnalyzer,
+            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldProcessor
         )
     }
 

@@ -104,7 +104,7 @@ data class OneRiskCauseSolution(
 ) : RiskCauseSolution {
     override val removedRpn: Double = (riskCause.rpn * risk.weight * process.weight)
     override val solutionCost: Double = riskCause.solutionCost
-    override val solutionEfficient: Double = removedRpn / riskCause.solutionCost
+    override val solutionEfficient: Double = removedRpn * 100 / riskCause.solutionCost
 }
 
 data class OneRiskSolution(
@@ -113,10 +113,10 @@ data class OneRiskSolution(
 ) : RiskSolution {
     override val removedRpn: Double = (risk.rpn * process.weight)
     override val solutionCost: Double = risk.solutionCost
-    override val solutionEfficient: Double = removedRpn / risk.solutionCost
+    override val solutionEfficient: Double = removedRpn * 100 / risk.solutionCost
 }
 
-class AverageRiskCauseSolution(riskCauseSolutions: List<OneRiskCauseSolution>) : RiskCauseSolution {
+class AverageRiskCauseSolution(val riskCauseSolutions: List<OneRiskCauseSolution>) : RiskCauseSolution {
     override val process: AnalyzedProcess = riskCauseSolutions.first().process
     override val risk: Risk = riskCauseSolutions.first().risk
     override val riskCause: RiskCause = riskCauseSolutions.first().riskCause
@@ -125,10 +125,46 @@ class AverageRiskCauseSolution(riskCauseSolutions: List<OneRiskCauseSolution>) :
     override val solutionEfficient: Double = riskCauseSolutions.sumByDouble { it.solutionEfficient }
 }
 
-class AverageRiskSolution(riskSolutions: List<OneRiskSolution>) : RiskSolution {
+class AverageRiskSolution(val riskSolutions: List<OneRiskSolution>) : RiskSolution {
     override val process: AnalyzedProcess = riskSolutions.first().process
     override val risk: Risk = riskSolutions.first().risk
     override val removedRpn: Double = riskSolutions.sumByDouble { it.removedRpn / riskSolutions.count() }
     override val solutionCost: Double = riskSolutions.sumByDouble { it.solutionCost / riskSolutions.count() }
     override val solutionEfficient: Double = riskSolutions.sumByDouble { it.solutionEfficient / riskSolutions.count() }
 }
+
+class RpnSolutionEfficientProps(
+    override val sigma: Double,
+    val upperRpnSolutionEfficientBound: Double,
+    val lowerRpnSolutionEfficientBound: Double,
+    val upperPercent: Double,
+    val lowerPercent: Double
+) : WaldProps {
+    override val u1: Double = upperRpnSolutionEfficientBound
+    override val u0: Double = lowerRpnSolutionEfficientBound
+    override val alpha: Double = 1 - lowerPercent
+    override val betta: Double = 1 - upperPercent
+}
+
+interface WaldProps {
+    val sigma: Double
+    val u1: Double
+    val u0: Double
+    val alpha: Double
+    val betta: Double
+}
+
+enum class SolutionDecision(val russianName: String) {
+    NONE("недостаточно наблюдений"),
+    ACCEPT("принять"),
+    DECLINE("отклонить")
+}
+
+data class SequentialAnalysisOfWaldResult(
+    val solution: RiskSolution,
+    val solutionDecision: SolutionDecision,
+    val resultStep: Int?,
+    val aiList: List<Double>,
+    val riList: List<Double>,
+    val cumulativeEfficient: List<Double>
+)

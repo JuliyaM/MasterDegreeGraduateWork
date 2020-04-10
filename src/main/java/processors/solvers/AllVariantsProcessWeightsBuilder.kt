@@ -3,7 +3,7 @@ package main.java.processors.solvers
 import main.java.extentions.getBinaryDistribution
 import koma.matrix.Matrix
 import koma.pow
-import processors.ProjectLifecycleBuilder
+import main.java.processors.ProjectLifecycleBuilder
 
 class AllVariantsProcessWeightsBuilder(
     private val projectLifecycleBuilder: ProjectLifecycleBuilder,
