@@ -1,14 +1,13 @@
 package main.java.processors.solvers
 
-import AnalyzedProject
-import DeltaResult
+import main.java.AnalyzedProject
+import main.java.DeltaResult
 import main.java.extentions.average
 import main.java.extentions.averageResult
 import koma.extensions.map
 import koma.matrix.Matrix
 import processors.solvers.AvgExperimentSolver
 import processors.solvers.DifferentialKolmogorovSolver
-import processors.solvers.EndProjectExperimentSolver
 import kotlin.math.absoluteValue
 
 data class WithEndProcessWeightSolveResult(
@@ -21,8 +20,7 @@ data class WithEndProcessWeightSolveResult(
     val endProjectExpCount: Int,
     val endProjectResultList: List<EndProjectExperimentSolver.ExperimentResult>,
     val endProjectResultListAverage: EndProjectExperimentSolver.ExperimentResult,
-    val endProjectToKolmogorovDelta: List<List<DeltaResult>>,
-    val averageResultDelta: List<DeltaResult>
+    val endProjectToKolmogorovDelta: List<List<DeltaResult>>
 )
 
 data class WithoutEndProcessWeightSolveResult(
@@ -31,10 +29,11 @@ data class WithoutEndProcessWeightSolveResult(
     val avgExperimentsCount: Int,
     val avgResult: List<Double>
 )
+
 class ProcessWeightSolver(
     private val differentialKolmogorovSolver: DifferentialKolmogorovSolver,
     private val avgExperimentSolver: AvgExperimentSolver,
-    private val endProjectExperimentSolver : EndProjectExperimentSolver
+    private val endProjectExperimentSolver: EndProjectExperimentSolver
 ) {
 
     fun getWithoutEndProjectProcessesWeights(
@@ -94,14 +93,15 @@ class ProcessWeightSolver(
             val kolmogorovI = multiKolmogorovResult[i].second
 
             endProjectI.averageResult.mapIndexed { j, averageValue ->
-                val absolute = (averageValue - kolmogorovI[j]).absoluteValue
-                DeltaResult(absolute = absolute, relative = absolute / averageValue)
-            }
-        }
+                val multiKolmogorovDelta = (averageValue - kolmogorovI[j]).absoluteValue
+                val averageKolmogorovDelta = (averageValue - resultKolmogorovDropEnd[j]).absoluteValue
 
-        val averageResultDelta = endProjectResultListAverage.averageResult.mapIndexed { j, averageValue ->
-            val absolute = (averageValue - resultKolmogorovDropEnd[j]).absoluteValue
-            DeltaResult(absolute = absolute, relative = absolute / averageValue)
+                val absoluteDelta = (multiKolmogorovDelta - averageKolmogorovDelta)
+                DeltaResult(
+                    absolute = absoluteDelta,
+                    relative = multiKolmogorovDelta / averageKolmogorovDelta
+                )
+            }
         }
 
         return WithEndProcessWeightSolveResult(
@@ -109,7 +109,6 @@ class ProcessWeightSolver(
             endProjectResultList = endProjectResultList,
             endProjectResultListAverage = endProjectResultListAverage,
             endProjectToKolmogorovDelta = endProjectToKolmogorovDelta,
-            averageResultDelta = averageResultDelta,
             processResultWeights = kolmogorovResultWeights,
             dropEndMatrix = dropEndMatrix,
             normalizedDropEndMatrix = normilizedDropEndMatrix,

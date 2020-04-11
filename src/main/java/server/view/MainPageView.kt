@@ -1,10 +1,8 @@
 package main.java.server.view
 
-import AnalyzedProject
-import AverageRiskSolution
-import OneRiskSolution
-import RpnSolutionEfficientProps
-import SequentialAnalysisOfWaldResult
+import main.java.AnalyzedProject
+import main.java.AverageRiskSolution
+import main.java.SequentialAnalysisOfWaldResult
 import kotlinx.html.*
 import main.java.processors.ProjectAnalyzeResult
 import main.java.server.MyMathBundle
@@ -16,10 +14,8 @@ import main.java.server.view.fragments.*
 class MainPageView(
     private val project: AnalyzedProject,
     private val projectAnalyzeResult: ProjectAnalyzeResult,
-    private val maxProjectRiskSolutions: List<OneRiskSolution>,
-    private val averageRiskSolutions: List<AverageRiskSolution>,
     private val waldResults: List<SequentialAnalysisOfWaldResult>,
-    private val rpnSolutionEfficientProps: RpnSolutionEfficientProps
+    private val clearedProjectVariants: List<AnalyzedProject>
 ) : HtmlView() {
 
     override fun getHTML(): HTML.() -> Unit =
@@ -73,21 +69,19 @@ class MainPageView(
                                 include(ResultProjectAnalyzeFragment(projectsVariants))
 
                                 p {
-                                    +"""Для выбора путей решений возьмем последнюю вариацию проекта с максимальным RPN. 
-                                        Расммотрим возможные решения каждого из рисков:"""
+                                    +"""Для выбора путей решений возьмем среднее значение показателей решений 
+|                                       для всех вариаций проекта:""".trimMargin()
                                 }
-                                include(RiskSolutionsFragment(maxProjectRiskSolutions))
-                                p {
-                                    +"""Рассмотрим среднее значение решений для всех вариаций проекта:"""
-                                }
-                                include(RiskSolutionsFragment(averageRiskSolutions))
+                                include(RiskSolutionsFragment(waldResults))
+
 
                                 p {
-                                    +"""
-                                    """.trimIndent()
+                                    + """Если рассмотреть ситуацию, что рекомендации будут выполненны в полном объеме
+                                        |проект получит следующую статистику:
+                                    """.trimMargin()
                                 }
+                                include(RpnProjectFragment(clearedProjectVariants))
 
-                                include(SequentialAnalysisOfWaldFragment(waldResults))
                             }
                         }
                     }

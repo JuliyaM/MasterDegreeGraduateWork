@@ -1,6 +1,6 @@
 package processors.repository
 
-import RiskCause
+import main.java.RiskCause
 import kotlin.random.Random
 
 class MockRiskCauseProvider {
@@ -17,8 +17,8 @@ class MockRiskCauseProvider {
             name = randomNames.random(),
             probability = Random.nextDouble(),
             detectability = Random.nextDouble(),
-            significance = Random.nextInt(11),
+            significance = Random.nextDouble(1.0,11.0),
             weight = Random.nextDouble(),
-            solutionCost = Random.nextDouble()
+            solutionCost = Random.nextDouble(1.0,11.0)
         )
 }

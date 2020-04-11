@@ -1,11 +1,8 @@
 package main.java.processors
 
-import AnalyzedProject
+import main.java.AnalyzedProject
 import koma.matrix.Matrix
-import main.java.processors.solvers.AllVariantsProcessWeightsBuilder
-import main.java.processors.solvers.ProcessWeightSolver
-import main.java.processors.solvers.WithEndProcessWeightSolveResult
-import main.java.processors.solvers.WithoutEndProcessWeightSolveResult
+import main.java.processors.solvers.*
 import processors.solvers.*
 
 class ProjectAnalyzer {
@@ -40,8 +37,8 @@ class ProjectAnalyzer {
         )
     }
 
-    fun analyze(randomProject: AnalyzedProject): ProjectAnalyzeResult {
-        val (startMatrix, startLabors, endProjectIndex) = randomProject.getSolveStartInfo()
+    fun analyze(startProject: AnalyzedProject): ProjectAnalyzeResult {
+        val (startMatrix, startLabors, endProjectIndex) = startProject.getSolveStartInfo()
         val projectMatrix = projectLifecycleBuilder.build(
             start = startMatrix,
             labors = startLabors,
@@ -54,41 +51,16 @@ class ProjectAnalyzer {
         )
 
         val projectWithEndProcessWeights = if (endProjectIndex != null) {
-            processWeightSolver.getProjectWithEndProcessWeights(projectMatrix, randomProject)
+            processWeightSolver.getProjectWithEndProcessWeights(projectMatrix, startProject)
         } else null
 
 
-        val laborsToWeights =
-            allVariantsProcessWeightsBuilder.getAllVariantsWeights(
-                startLabors = startLabors,
-                start = startMatrix,
-                startProcessIndex = randomProject.startProcessIndex,
-                endRowIndex = endProjectIndex
-            )
-
-
-        val processesWithoutEnd =
-            if (endProjectIndex != null) randomProject.processes.toMutableList().apply { removeAt(endProjectIndex) }
-            else randomProject.processes
-
         val projectsVariants =
-            laborsToWeights
-                .map { (labor, weight) ->
-                    randomProject.copy(
-                        processes = processesWithoutEnd.mapIndexed { index, analyzedProcess ->
-                            analyzedProcess.copy(
-                                labor = labor.getOrNull(index) ?: 0,
-                                weight = weight.getOrNull(index) ?: 0.0
-                            )
-                        }
-                    )
-                }
-                .sortedBy {
-                    it.rpn
-                }
+            getProjectVariants(startLabors, startMatrix, startProject, endProjectIndex)
 
 
         return ProjectAnalyzeResult(
+            startProject = startProject,
             projectMatrix = projectMatrix,
             withoutEndProcessWeightSolveResult = withoutEndProjectProcessesWeights,
             withEndProcessWeightSolveResult = projectWithEndProcessWeights,
@@ -96,9 +68,58 @@ class ProjectAnalyzer {
         )
     }
 
+    fun getProjectVariants(startProject: AnalyzedProject): List<AnalyzedProject> {
+        val (startMatrix, startLabors, endProjectIndex) = startProject.getSolveStartInfo()
+        return getProjectVariants(
+            startLabors = startLabors,
+            startMatrix = startMatrix,
+            startProject = startProject,
+            endProjectIndex = endProjectIndex
+        )
+    }
+
+    private fun getProjectVariants(
+        startLabors: List<Int>,
+        startMatrix: Matrix<Double>,
+        startProject: AnalyzedProject,
+        endProjectIndex: Int?
+    ): List<AnalyzedProject> {
+        val laborsToWeights =
+            allVariantsProcessWeightsBuilder.getAllVariantsWeights(
+                startLabors = startLabors,
+                start = startMatrix,
+                startProcessIndex = startProject.startProcessIndex,
+                endRowIndex = endProjectIndex
+            )
+
+
+        val processesWithoutEnd =
+            if (endProjectIndex != null) startProject.processes.toMutableList().apply { removeAt(endProjectIndex) }
+            else startProject.processes
+
+        val projectsVariants =
+            laborsToWeights
+                .map { (labor, weight) ->
+                    startProject.copy(
+                        processes = processesWithoutEnd.mapIndexed { index, analyzedProcess ->
+                            analyzedProcess.copy(
+                                labor = labor.getOrNull(index) ?: 0,
+                                weight = weight.getOrNull(index) ?: 0.0
+                            )
+                        },
+                        isOriginal = false
+                    )
+                }
+                .sortedBy {
+                    it.rpn
+                }
+        return projectsVariants
+    }
+
 }
 
 data class ProjectAnalyzeResult(
+    val startProject: AnalyzedProject,
     val projectMatrix: Matrix<Double>,
     val withoutEndProcessWeightSolveResult: WithoutEndProcessWeightSolveResult,
     val withEndProcessWeightSolveResult: WithEndProcessWeightSolveResult?,

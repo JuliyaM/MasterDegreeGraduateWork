@@ -1,12 +1,11 @@
 package main.java.server.view.fragments
 
-import AnalyzedProject
+import main.java.AnalyzedProject
 import kotlinx.html.*
+import ktorModuleLibrary.librariesExtentions.median
 import main.java.extentions.*
-import main.java.server.LoggerHelper
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
-import org.nield.kotlinstatistics.medianBy
 
 class ResultProjectAnalyzeFragment(
     private val projectsVariants: List<AnalyzedProject>
@@ -38,7 +37,7 @@ class ResultProjectAnalyzeFragment(
                 projectsVariants.first().processes.forEach { process ->
                     tr {
                         td {
-                            colSpan = "9"
+                            colSpan = "10"
                             +process.name
                         }
                     }
@@ -73,107 +72,7 @@ class ResultProjectAnalyzeFragment(
                 }
             }
         ))
-        val processNames = projectsVariants.first().processes.map { it.name }
-
-        //todo refactor logic from view
-        include(UiTableFragment(
-            tableName = "RPN проекта",
-            tHead = {
-                tr {
-                    th { +"#" }
-                    th { +"RPN проекта" }
-                    processNames.forEach {
-                        th {
-                            +"RPN процесса $it"
-                        }
-                    }
-                }
-            },
-            tBody = {
-                projectsVariants.forEachIndexed { index, project ->
-                    tr {
-                        td {
-                            +index.toString()
-                        }
-
-                        this.project(project)
-                    }
-                }
-                projectsVariants.medianBy({ it }, { it.rpn }).keys.first().let {
-                    tr {
-                        td {
-                            b {
-                                +"Медиана"
-                            }
-                        }
-                        this.project(it)
-                    }
-                }
-
-
-                val averageProcessesRpn = projectsVariants
-                    .sumByListDouble { project ->
-                        project.processes.map { process -> process.rpn }
-                    }
-                    .map {
-                        it / projectsVariants.size
-                    }
-
-                val averageProjectRpn = projectsVariants.average {
-                    it.rpn
-                }
-
-                tr {
-                    td {
-                        b {
-                            +"Среднее"
-                        }
-                    }
-                    this.project(averageProjectRpn, averageProcessesRpn)
-                }
-
-                val minProcessesRpn = projectsVariants
-                    .minByListDouble { project ->
-                        project.processes.map { process -> process.rpn }
-                    }
-
-                val minProjectRpn = projectsVariants.map { it.rpn }.min() ?: 0.0
-
-                tr {
-                    td {
-                        b {
-                            +"Минимум"
-                        }
-                    }
-                    this.project(minProjectRpn, minProcessesRpn)
-                }
-
-                val maxProcessesRpn = projectsVariants
-                    .maxByListDouble { project ->
-                        project.processes.map { process -> process.rpn }
-                    }
-
-                val maxProjectRpn = projectsVariants.map { it.rpn }.max() ?: 0.0
-
-                tr {
-                    td {
-                        b {
-                            +"Максимум"
-                        }
-                    }
-                    this.project(maxProjectRpn, maxProcessesRpn)
-                }
-            }
-        ))
-        val processVariants = projectsVariants.map { it.processes }
-        val transposeProcesses = processVariants.transpose()
-
-        chartTag(
-            labels = transposeProcesses.first().indices.map { it.toString() },
-            colorLabelDatas = transposeProcesses.mapIndexed { index, processVariant ->
-                Triple(chartColors[index.rem(chartColors.size)], processVariant.first().name, processVariant.map { it.rpn })
-            }
-        )
+        include(RpnProjectFragment(projectsVariants))
     }
 }
 

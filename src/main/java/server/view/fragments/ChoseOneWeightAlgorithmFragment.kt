@@ -1,13 +1,12 @@
 package main.java.server.view.fragments
 
-import AnalyzedProject
+import main.java.AnalyzedProject
 import main.java.extentions.round
 import kotlinx.html.*
 import main.java.extentions.arrayTag
 import main.java.extentions.transpose
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
-import org.nield.kotlinstatistics.median
 import processors.MathJaxHelper
 
 class ChoseOneWeightAlgorithmFragment(

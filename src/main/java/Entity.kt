@@ -1,14 +1,22 @@
+package main.java
+
 import koma.matrix.Matrix
 
 data class RiskCause(
     val name: String,
     val probability: Double,
     val detectability: Double,
-    val significance: Int,
+    val significance: Double,
     val solutionCost: Double,
     val weight: Double
 ) {
     val rpn: Double = detectability * probability * significance * weight
+
+    val id = ID++
+
+    companion object {
+        private var ID = 0
+    }
 }
 
 data class Risk(
@@ -18,6 +26,12 @@ data class Risk(
 ) {
     val rpn: Double = riskCauses.sumByDouble { it.rpn } * weight
     val solutionCost: Double = riskCauses.sumByDouble { it.solutionCost }
+
+    val id = ID++
+
+    companion object {
+        private var ID = 0
+    }
 }
 
 data class AnalyzedProcess(
@@ -25,12 +39,15 @@ data class AnalyzedProcess(
     val risks: List<Risk>,
     val labor: Int,
     val weight: Double = 0.0,
-    val transitions: List<Double>
+    val transitions: List<Double>,
+    val id: Int = ID++
 ) {
     val rpn: Double = risks.sumByDouble { it.rpn } * weight
     fun withWeight(weightValue: Double) = copy(weight = weightValue)
 
     companion object {
+        private var ID = 0
+
         val EMPTY = AnalyzedProcess(
             weight = 0.0,
             name = "",
@@ -45,8 +62,12 @@ data class AnalyzedProject(
     val name: String,
     val processes: List<AnalyzedProcess>,
     val startProcessIndex: Int,
-    val endProjectIndex: Int?
+    val endProjectIndex: Int?,
+    val id: Int = ID++,
+    val isOriginal: Boolean = true
 ) {
+    val rpn: Double = processes.sumByDouble { it.rpn }
+
     fun toProjectTransitionsMatrix(): Matrix<Double> {
         return Matrix(processes.count(), processes.count()) { rowIndex, colIndex ->
             processes[rowIndex].transitions[colIndex]
@@ -60,7 +81,10 @@ data class AnalyzedProject(
         return ProjectSolveStartInfo(startMatrix, startLabors, endProjectIndex)
     }
 
-    val rpn: Double = processes.sumByDouble { it.rpn }
+    companion object {
+        private var ID = 0
+    }
+
 }
 
 data class ProjectSolveStartInfo(
@@ -90,6 +114,7 @@ interface RiskCauseSolution {
 }
 
 interface RiskSolution {
+    val id: Int
     val process: AnalyzedProcess
     val risk: Risk
     val removedRpn: Double
@@ -109,11 +134,17 @@ data class OneRiskCauseSolution(
 
 data class OneRiskSolution(
     override val process: AnalyzedProcess,
-    override val risk: Risk
+    override val risk: Risk,
+    override val id: Int = ID++
 ) : RiskSolution {
     override val removedRpn: Double = (risk.rpn * process.weight)
     override val solutionCost: Double = risk.solutionCost
     override val solutionEfficient: Double = removedRpn * 100 / risk.solutionCost
+
+
+    companion object {
+        private var ID = 0
+    }
 }
 
 class AverageRiskCauseSolution(val riskCauseSolutions: List<OneRiskCauseSolution>) : RiskCauseSolution {
@@ -125,25 +156,29 @@ class AverageRiskCauseSolution(val riskCauseSolutions: List<OneRiskCauseSolution
     override val solutionEfficient: Double = riskCauseSolutions.sumByDouble { it.solutionEfficient }
 }
 
-class AverageRiskSolution(val riskSolutions: List<OneRiskSolution>) : RiskSolution {
-    override val process: AnalyzedProcess = riskSolutions.first().process
+class AverageRiskSolution(val riskSolutions: List<OneRiskSolution>, override val id: Int = ID++) : RiskSolution {
+    override val process: AnalyzedProcess = riskSolutions.first().process //todo remove and set process to risk
     override val risk: Risk = riskSolutions.first().risk
     override val removedRpn: Double = riskSolutions.sumByDouble { it.removedRpn / riskSolutions.count() }
     override val solutionCost: Double = riskSolutions.sumByDouble { it.solutionCost / riskSolutions.count() }
     override val solutionEfficient: Double = riskSolutions.sumByDouble { it.solutionEfficient / riskSolutions.count() }
+
+
+    companion object {
+        private var ID = 0
+    }
 }
 
 class RpnSolutionEfficientProps(
     override val sigma: Double,
     val upperRpnSolutionEfficientBound: Double,
     val lowerRpnSolutionEfficientBound: Double,
-    val upperPercent: Double,
-    val lowerPercent: Double
+    override val alpha: Double,
+    override val betta: Double
 ) : WaldProps {
     override val u1: Double = upperRpnSolutionEfficientBound
     override val u0: Double = lowerRpnSolutionEfficientBound
-    override val alpha: Double = 1 - lowerPercent
-    override val betta: Double = 1 - upperPercent
+
 }
 
 interface WaldProps {
@@ -166,5 +201,10 @@ data class SequentialAnalysisOfWaldResult(
     val resultStep: Int?,
     val aiList: List<Double>,
     val riList: List<Double>,
-    val cumulativeEfficient: List<Double>
-)
+    val cumulativeEfficient: List<Double>,
+    val id: Int = ID++
+) {
+    companion object {
+        private var ID = 0
+    }
+}

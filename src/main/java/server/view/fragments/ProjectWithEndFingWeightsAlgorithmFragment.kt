@@ -1,6 +1,6 @@
 package main.java.server.view.fragments
 
-import AnalyzedProject
+import main.java.AnalyzedProject
 import main.java.extentions.powLatex
 import main.java.extentions.round
 import main.java.extentions.withIndexLatex
@@ -117,7 +117,8 @@ class ProjectWithEndFingWeightsAlgorithmFragment(
 
 
             p {
-                +"Расчитаем отклонение экспериментальных значений и аналитических:"
+                +"""Расчитаем отклонение разницу в отклонениях экспериментальных значений и аналитических (при использовании
+|                   модифицированных матриц и начальной):""".trimMargin()
             }
 
             include(UiTableFragment(
@@ -136,23 +137,9 @@ class ProjectWithEndFingWeightsAlgorithmFragment(
                             td { +"Начало в процессе ${project.processes[index].name}" }
                             deltaResult
                                 .forEach {
-                                    td { +"${it.absolute.round(2)}" }
+                                    td { +"${it.absolute.round(2)}" }  // (на ${((1 - it.relative) * 100).round(2)}% меньше)"
                                 }
                         }
-                    }
-                },
-                tFoot = {
-                    tr {
-                        td {
-                            b { +"Среднее значение" }
-                        }
-
-                        averageResultDelta
-                            .forEach {
-                                td {
-                                    b { +it.absolute.round(2).toString() }
-                                }
-                            }
                     }
                 }
             ))

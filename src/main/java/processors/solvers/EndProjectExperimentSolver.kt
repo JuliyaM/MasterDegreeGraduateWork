@@ -1,4 +1,4 @@
-package processors.solvers
+package main.java.processors.solvers
 
 import MatrixWalker
 import main.java.extentions.averageResult

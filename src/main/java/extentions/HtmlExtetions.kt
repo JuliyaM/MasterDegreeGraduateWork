@@ -1,9 +1,10 @@
 package main.java.extentions
 
-import AnalyzedProject
-import RiskCause
+import main.java.AnalyzedProject
+import main.java.RiskCause
 import koma.extensions.map
 import koma.matrix.Matrix
+import kotlinx.css.Color
 import kotlinx.html.*
 import processors.MathJaxHelper
 import java.net.URLEncoder
@@ -46,10 +47,37 @@ val chartColors = listOf(
     "#FFCBA3",
     "#C8E0CF",
     "#FEE3EE"
-).shuffled()
+).map { Color(it) }.shuffled()
 
 
-fun FlowContent.chartTag(labels: List<Any>, colorLabelDatas: List<Triple<String, String, List<Double>>>) {
+enum class ChartType(val text: String) {
+    LINE("line"),
+    BAR("bar")
+}
+
+data class OneChartInfo(
+    val backgroundColor: Color,
+    val borderColor: Color,
+    val label: String,
+    val borderWidth: Int?,
+    val data: Iterable<Number>
+) {
+    companion object {
+        val EMPTY = OneChartInfo(
+            backgroundColor = Color.transparent,
+            borderColor = Color.transparent,
+            label = "",
+            borderWidth = null,
+            data = listOf()
+        )
+    }
+}
+
+fun FlowContent.chartTag(
+    labels: List<Any>,
+    oneChartInfos: Iterable<OneChartInfo>,
+    chartType: ChartType = ChartType.LINE
+) {
     val chardID = "myChart${Random.nextInt(100000)}"
 
     canvas {
@@ -60,20 +88,21 @@ fun FlowContent.chartTag(labels: List<Any>, colorLabelDatas: List<Triple<String,
             raw("""
                 new Chart(document.getElementById('$chardID').getContext('2d'), {
                   // The type of chart we want to create
-                  type: 'line',
+                  type: '${chartType.text}',
             
                   // The data for our dataset
                   data: {
                     labels: [${labels.joinToString(", ") { "\"$it\"" }}],
                     datasets: [
                     ${
-            colorLabelDatas.joinToString(",\n") { colorLabelData ->
+            oneChartInfos.joinToString(",\n") { oneChartInfo ->
                 """
                     {
-                      label: '${colorLabelData.second}',
-                      backgroundColor: 'transparent',
-                      borderColor: '${colorLabelData.first}',
-                      data: [${colorLabelData.third.joinToString(", ")}]
+                      label: '${oneChartInfo.label}',
+                      backgroundColor: '${oneChartInfo.backgroundColor}',
+                      borderColor: '${oneChartInfo.borderColor}',
+                      ${if (oneChartInfo.borderWidth != null) "borderWidth: ${oneChartInfo.borderWidth}," else ""}
+                      data: [${oneChartInfo.data.joinToString(", ")}]
                     }
                 """
             }
@@ -121,7 +150,13 @@ fun TR.project(project: AnalyzedProject) {
         .map {
             it.rpn
         }
-    project(projectRpn, processRpns)
+    this.project(projectRpn, processRpns)
+}
+
+fun TR.project(
+    processRpns: List<Double>
+) {
+    this.project(processRpns.sum(), processRpns)
 }
 
 fun TR.project(
@@ -166,7 +201,7 @@ fun TR.riskCause(riskCause: RiskCause) {
         +riskCause.detectability.round(2).toString()
     }
     td {
-        +riskCause.significance.toString()
+        +riskCause.significance.round(2).toString()
     }
     td {
         +riskCause.solutionCost.round(2).toString()

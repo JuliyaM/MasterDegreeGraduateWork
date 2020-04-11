@@ -1,25 +1,13 @@
 package main.java.processors
 
-import AnalyzedProject
-import OneRiskCauseSolution
-import OneRiskSolution
+import main.java.AnalyzedProject
+import main.java.AverageRiskSolution
+import main.java.OneRiskSolution
+import main.java.extentions.transpose
 
 class SolutionsAnalyzer {
-    fun getSolutions(project: AnalyzedProject): Pair<List<OneRiskCauseSolution>, List<OneRiskSolution>> {
-        val riskCauseSolutions = project.processes
-            .map { process ->
-                process.risks.map { risk ->
-                    risk.riskCauses.map {
-                        OneRiskCauseSolution(process, risk, it)
-                    }
-                }.flatten()
-            }
-            .flatten()
-            .sortedBy {
-                it.solutionEfficient
-            }
-
-        val riskSolutions = project.processes
+    fun getSolutions(project: AnalyzedProject): List<OneRiskSolution> {
+        return project.processes
             .map { process ->
                 process.risks.map { risk -> OneRiskSolution(process, risk) }
             }
@@ -27,7 +15,12 @@ class SolutionsAnalyzer {
             .sortedBy {
                 it.solutionEfficient
             }
+    }
 
-        return riskCauseSolutions to riskSolutions
+    fun averageRiskSolutions(projectAnalyzeResult: ProjectAnalyzeResult): List<AverageRiskSolution> {
+        return projectAnalyzeResult.projectsVariants
+            .map { getSolutions(it) }
+            .transpose()
+            .map { AverageRiskSolution(it) }
     }
 }

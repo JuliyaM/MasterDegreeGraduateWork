@@ -1,6 +1,6 @@
 package main.java.server.view.fragments
 
-import RiskCauseSolution
+import main.java.RiskCauseSolution
 import kotlinx.html.*
 import main.java.extentions.*
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
@@ -12,11 +12,6 @@ class RiskCauseSolutionsFragment(
 ) : HtmlFragment {
 
     override fun getFragment(): FlowContent.() -> Unit = {
-        p {
-            +"""Для выбора путей решений возьмем последнюю вариацию проекта с максимальным RPN. Расммотрим возможные решения
-                каждой из причин появления рисков:
-            """
-        }
         include(UiTableFragment(
             tableName = "Возможные решения",
             tHead = {
@@ -63,11 +58,11 @@ class RiskCauseSolutionsFragment(
 
         chartTag(
             labels = riskCauseSolutions.indices.map { it.toString() },
-            colorLabelDatas = listOf(
-                Triple(
-                    chartColors.random(),
-                    "Решения",
-                    riskCauseSolutions.map { it.solutionEfficient }
+            oneChartInfos = listOf(
+                OneChartInfo.EMPTY.copy(
+                    borderColor = chartColors.random(),
+                    label = "Решения",
+                    data = riskCauseSolutions.map { it.solutionEfficient }
                 )
             )
         )

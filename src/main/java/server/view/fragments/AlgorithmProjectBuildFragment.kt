@@ -1,6 +1,6 @@
 package main.java.server.view.fragments
 
-import AnalyzedProject
+import main.java.AnalyzedProject
 import main.java.extentions.LS
 import main.java.extentions.frac
 import main.java.extentions.round

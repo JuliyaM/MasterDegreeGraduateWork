@@ -1,5 +1,6 @@
 package main.java.server
 
+import main.java.RpnSolutionEfficientProps
 import com.google.gson.GsonBuilder
 import main.java.server.features.FileProviderFeature
 import io.ktor.application.Application
@@ -22,9 +23,12 @@ import main.java.server.controllers.MainPageController
 import main.java.server.controllers.StaticRecursiveRoutingController
 import main.java.server.ktorModuleLibrary.modules.KtorModule
 import processors.repository.MockProcessesProvider
-import processors.repository.MockProjectsProvider
+import main.java.processors.repository.MockProjectsProvider
 import processors.repository.MockRiskCauseProvider
 import main.java.processors.repository.MockRiskProvider
+import main.java.processors.repository.Store
+import main.java.server.controllers.DispersionPageController
+import main.java.server.controllers.WaldPageController
 
 const val PRODUCTION = false
 
@@ -64,8 +68,22 @@ class FrontEndKtorModule : KtorModule() {
         SolutionsAnalyzer()
     }
 
+    private val rpnSolutionEfficientProps by lazy {
+        RpnSolutionEfficientProps(
+            sigma = 1.73,
+            upperRpnSolutionEfficientBound = 1.48,
+            lowerRpnSolutionEfficientBound = 0.12,
+            alpha = 0.1,
+            betta = 0.15
+        )
+    }
+
     private val sequentialAnalysisOfWaldProcessor by lazy {
-        SequentialAnalysisOfWaldProcessor()
+        SequentialAnalysisOfWaldProcessor(rpnSolutionEfficientProps)
+    }
+
+    private val store by lazy {
+        Store()
     }
 
     private val mainPageController by lazy {
@@ -75,7 +93,24 @@ class FrontEndKtorModule : KtorModule() {
             mockProjectProvider = mockProjectProvider,
             projectAnalyzer = projectAnalyzer,
             solutionsAnalyzer = solutionsAnalyzer,
-            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldProcessor
+            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldProcessor,
+            store = store
+        )
+    }
+
+    private val waldPageController by lazy {
+        WaldPageController(
+            routingPath = "wald",
+            minimalPermission = 0,
+            store = store
+        )
+    }
+
+    private val dispersionController by lazy {
+        DispersionPageController(
+            routingPath = "dispersion",
+            minimalPermission = 0,
+            mockProcessesProvider = mockProcessesProvider
         )
     }
 
@@ -97,6 +132,8 @@ class FrontEndKtorModule : KtorModule() {
                 routing {
                     include(staticRecursiveRoutingController)
                     include(mainPageController)
+                    include(dispersionController)
+                    include(waldPageController)
                 }
 
             }

@@ -1,6 +1,7 @@
-package processors.repository
+package main.java.processors.repository
 
-import AnalyzedProject
+import main.java.AnalyzedProject
+import processors.repository.MockProcessesProvider
 import kotlin.random.Random
 
 class MockProjectsProvider(

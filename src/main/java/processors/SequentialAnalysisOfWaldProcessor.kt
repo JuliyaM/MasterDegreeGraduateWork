@@ -1,25 +1,20 @@
 package main.java.processors
 
-import OneRiskSolution
-import SequentialAnalysisOfWaldResult
-import SolutionDecision
-import WaldProps
-import koma.internal.default.utils.accumulateRight
+import main.java.OneRiskSolution
+import main.java.SequentialAnalysisOfWaldResult
+import main.java.SolutionDecision
+import main.java.WaldProps
 import koma.ln
 import koma.pow
 import main.java.extentions.reductions
 
-class SequentialAnalysisOfWaldProcessor {
+data class SequentialAnalysisOfWaldProcessor(
+    val waldProps: WaldProps
+) {
 
-    fun analyze(waldProps: WaldProps, riskSolutions: List<OneRiskSolution>): SequentialAnalysisOfWaldResult {
-        val (aiList, riList) = riskSolutions.indices.map { i ->
-            with(waldProps) {
-                val plusEq = (i + 1) * (u1 + u0) / 2
-                val ai = (sigma.pow(2) / (u1 - u0)) * ln(betta / (1 - alpha)) + plusEq
-                val bi = (sigma.pow(2) / (u1 + u0)) * ln((1 - betta) / alpha) + plusEq
-                ai to bi
-            }
-        }.let { aiRi -> aiRi.map { it.first } to aiRi.map { it.second } }
+
+    fun analyze(riskSolutions: List<OneRiskSolution>): SequentialAnalysisOfWaldResult {
+        val (aiList, riList) = processWaldProps(riskSolutions.size, waldProps)
 
 
         val cumulativeEfficient =
@@ -42,9 +37,24 @@ class SequentialAnalysisOfWaldProcessor {
                 else -> SolutionDecision.NONE
             },
             resultStep = result?.index,
-            aiList = aiList,
-            riList = riList,
-            cumulativeEfficient = cumulativeEfficient
+            aiList = aiList.subList(0, result?.index?.plus(1) ?: aiList.size),
+            riList = riList.subList(0, result?.index?.plus(1) ?: riList.size),
+            cumulativeEfficient = cumulativeEfficient.subList(0, result?.index?.plus(1) ?: cumulativeEfficient.size)
         )
+    }
+
+    fun processWaldProps(count: Int, waldProps: WaldProps): Pair<List<Double>, List<Double>> {
+        return with(waldProps) {
+            val multiplEq = sigma.pow(2) / (u1 - u0)
+            val A = ln(betta / (1 - alpha))
+            val B = ln((1 - betta) / alpha)
+
+            (0 until count).map { i ->
+                val plusEq = (i + 1) * (u1 + u0) / 2
+                val ai = multiplEq * A + plusEq
+                val ri = multiplEq * B + plusEq
+                ai to ri
+            }.let { aiRi -> aiRi.map { it.first } to aiRi.map { it.second } }
+        }
     }
 }

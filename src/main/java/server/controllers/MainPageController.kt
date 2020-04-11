@@ -1,18 +1,18 @@
 package main.java.server.controllers
 
-import AverageRiskSolution
-import RpnSolutionEfficientProps
 import io.ktor.application.call
 import io.ktor.html.respondHtml
+import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
-import main.java.extentions.transpose
+import main.java.SolutionDecision
 import main.java.processors.ProjectAnalyzer
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
+import main.java.processors.repository.Store
 import main.java.server.view.MainPageView
-import processors.repository.MockProjectsProvider
+import main.java.processors.repository.MockProjectsProvider
 
 class MainPageController(
     routingPath: String,
@@ -20,47 +20,63 @@ class MainPageController(
     private val mockProjectProvider: MockProjectsProvider,
     private val projectAnalyzer: ProjectAnalyzer,
     private val solutionsAnalyzer: SolutionsAnalyzer,
-    private val sequentialAnalysisOfWaldProcessor: SequentialAnalysisOfWaldProcessor
+    private val sequentialAnalysisOfWaldProcessor: SequentialAnalysisOfWaldProcessor,
+    private val store: Store
 ) : RoutingController(routingPath, minimalPermission) {
 
     override fun createFormRouting(): Route.() -> Unit = {
         get(routingPath) {
+            val projectID = call.request.queryParameters["projectID"]?.toIntOrNull()
+            val restoredProject = projectID?.let { store.restoreProject(it) }
+            val project = restoredProject ?: run {
+                val randomProject = mockProjectProvider.randomProject()
+                store.saveProject(randomProject)
+                randomProject
+            }
+            if (restoredProject == null) return@get call.respondRedirect {
+                this.parameters["projectID"] = project.id.toString()
+            }
+            val projectAnalyzeResult = store.restoreProjectAnalyzeResult(project.id) ?: run {
+                val analyze = projectAnalyzer.analyze(project)
+                store.saveProjectAnalyzeResult(project, analyze)
+                analyze
+            }
 
-            val rpnSolutionEfficientProps = RpnSolutionEfficientProps(
-                sigma = 3.9,
-                upperRpnSolutionEfficientBound = 10.0,
-                lowerRpnSolutionEfficientBound = 1.0,
-                upperPercent = 0.9,
-                lowerPercent = 0.99
-            )
+            val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult)
 
-            val randomProject = mockProjectProvider.randomProject()
-            val projectAnalyzeResult = projectAnalyzer.analyze(randomProject)
-
-            val maxRpnProject = projectAnalyzeResult
-                .projectsVariants
-                .maxBy { it.rpn } ?: randomProject
-
-            val averageRiskSolutions = projectAnalyzeResult.projectsVariants
-                .map { solutionsAnalyzer.getSolutions(it).second }
-                .transpose()
-                .map { AverageRiskSolution(it) }
-
-
-            val (_, maxProjectRiskSolutions) = solutionsAnalyzer.getSolutions(maxRpnProject)
+            store.saveAverageRiskSolutions(averageRiskSolutions)
 
             val waldResults = averageRiskSolutions.map {
-                sequentialAnalysisOfWaldProcessor.analyze(rpnSolutionEfficientProps, it.riskSolutions)
+                sequentialAnalysisOfWaldProcessor.analyze(it.riskSolutions)
             }
+
+            store.saveWaldResults(waldResults)
+
+
+            val clearedProjectVariants = projectAnalyzer.getProjectVariants(
+                project.copy(processes = project.processes
+                    .map { process ->
+                        val clearedRisks = process.risks.mapNotNull { risk ->
+                            when (waldResults.find { it.solution.risk.id == risk.id }?.solutionDecision) {
+                                SolutionDecision.NONE -> risk
+                                SolutionDecision.ACCEPT -> null
+                                SolutionDecision.DECLINE -> risk
+                                null -> throw Exception("no decision")
+                            }
+                        }
+
+                        val newRiskSumWeight = clearedRisks.sumByDouble { it.weight }
+                        //normalize weights
+                        process.copy(risks = clearedRisks.map { it.copy(weight = it.weight / newRiskSumWeight) })
+                    })
+            )
 
             call.respondHtml(
                 block = MainPageView(
-                    project = randomProject,
+                    project = project,
+                    clearedProjectVariants = clearedProjectVariants,
                     projectAnalyzeResult = projectAnalyzeResult,
-                    maxProjectRiskSolutions = maxProjectRiskSolutions,
-                    averageRiskSolutions = averageRiskSolutions,
-                    waldResults = waldResults,
-                    rpnSolutionEfficientProps = rpnSolutionEfficientProps
+                    waldResults = waldResults
                 ).getHTML()
             )
         }
