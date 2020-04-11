@@ -70,11 +70,11 @@ class FrontEndKtorModule : KtorModule() {
 
     private val rpnSolutionEfficientProps by lazy {
         RpnSolutionEfficientProps(
-            sigma = 1.73,
-            upperRpnSolutionEfficientBound = 1.48,
-            lowerRpnSolutionEfficientBound = 0.12,
+            sigma = 4.81,
+            upperRpnSolutionEfficientBound = 5.21,
+            lowerRpnSolutionEfficientBound = 0.8,
             alpha = 0.1,
-            betta = 0.15
+            betta = 0.1
         )
     }
 

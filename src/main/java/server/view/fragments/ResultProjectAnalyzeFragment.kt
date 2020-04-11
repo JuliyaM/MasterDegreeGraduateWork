@@ -23,7 +23,6 @@ class ResultProjectAnalyzeFragment(
                 tr {
                     th { +"Риск" }
                     th { +"RPN" }
-                    th { +"Вес риска" }
                     th { +"Причина появления риска" }
                     th { +"RPN" }
                     th { +"Вес причины" }
@@ -51,10 +50,6 @@ class ResultProjectAnalyzeFragment(
                             td {
                                 rowSpan = riskCauseCount.toString()
                                 +risk.rpn.round(2).toString()
-                            }
-                            td {
-                                rowSpan = riskCauseCount.toString()
-                                +risk.weight.round(2).toString()
                             }
 
                             risk.riskCauses.firstOrNull()?.let {

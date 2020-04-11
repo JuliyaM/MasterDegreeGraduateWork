@@ -65,9 +65,8 @@ class MainPageController(
                             }
                         }
 
-                        val newRiskSumWeight = clearedRisks.sumByDouble { it.weight }
                         //normalize weights
-                        process.copy(risks = clearedRisks.map { it.copy(weight = it.weight / newRiskSumWeight) })
+                        process.copy(risks = clearedRisks)
                     })
             )
 

@@ -175,7 +175,7 @@ fun TR.project(
     processRpns.forEach {
         td {
             val rpnValue = it.round(3)
-            if (rpnValue > 1.25 / processRpns.size) {
+            if (rpnValue > 1.1) {
                 b {
                     +rpnValue.toString()
                 }

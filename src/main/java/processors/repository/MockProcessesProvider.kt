@@ -21,11 +21,9 @@ class MockProcessesProvider(
         val risks = (0 until riskCount).map {
             riskProvider.randomRisk()
         }
-
-        val risksCauseWeightSum = risks.sumByDouble { it.weight }
         return AnalyzedProcess.EMPTY.copy(
             name = randomNames.random(),
-            risks = risks.map { it.copy(weight = it.weight / risksCauseWeightSum) },
+            risks = risks,
             labor = Random.nextInt(10, 100)
         )
     }

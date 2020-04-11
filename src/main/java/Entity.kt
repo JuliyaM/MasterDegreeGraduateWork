@@ -21,10 +21,9 @@ data class RiskCause(
 
 data class Risk(
     val name: String,
-    val weight: Double,
     val riskCauses: List<RiskCause>
 ) {
-    val rpn: Double = riskCauses.sumByDouble { it.rpn } * weight
+    val rpn: Double = riskCauses.sumByDouble { it.rpn }
     val solutionCost: Double = riskCauses.sumByDouble { it.solutionCost }
 
     val id = ID++
@@ -127,7 +126,7 @@ data class OneRiskCauseSolution(
     override val risk: Risk,
     override val riskCause: RiskCause
 ) : RiskCauseSolution {
-    override val removedRpn: Double = (riskCause.rpn * risk.weight * process.weight)
+    override val removedRpn: Double = (riskCause.rpn * process.weight)
     override val solutionCost: Double = riskCause.solutionCost
     override val solutionEfficient: Double = removedRpn * 100 / riskCause.solutionCost
 }

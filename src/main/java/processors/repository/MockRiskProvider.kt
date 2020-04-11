@@ -21,8 +21,8 @@ class MockRiskProvider(
         val riskCauseWeightSum = riskCauses.sumByDouble { it.weight }
         return Risk(
             name = randomNames.random(),
-            riskCauses = riskCauses.map { it.copy(weight = it.weight / riskCauseWeightSum) },
-            weight = Random.nextDouble()
+            riskCauses = riskCauses.map { it.copy(weight = it.weight / riskCauseWeightSum) }
+//            weight = Random.nextDouble()
         )
     }
 }
