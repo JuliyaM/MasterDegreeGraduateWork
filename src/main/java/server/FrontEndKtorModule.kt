@@ -1,6 +1,5 @@
 package main.java.server
 
-import main.java.RpnSolutionEfficientProps
 import com.google.gson.GsonBuilder
 import main.java.server.features.FileProviderFeature
 import io.ktor.application.Application
@@ -16,6 +15,7 @@ import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
 import ktorModuleLibrary.ktorHtmlExtentions.include
+import main.java.WaldProps
 import main.java.processors.ProjectAnalyzer
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
@@ -68,18 +68,32 @@ class FrontEndKtorModule : KtorModule() {
         SolutionsAnalyzer()
     }
 
-    private val rpnSolutionEfficientProps by lazy {
-        RpnSolutionEfficientProps(
-            sigma = 4.81,
-            upperRpnSolutionEfficientBound = 5.21,
-            lowerRpnSolutionEfficientBound = 0.8,
-            alpha = 0.1,
-            betta = 0.1
+    private val solutionEfficientProps by lazy {
+        WaldProps(
+            sigma = 4.78,
+            u1 = 2.88,
+            u0 = 0.56,
+            alpha = 0.25,
+            betta = 0.15
         )
     }
 
-    private val sequentialAnalysisOfWaldProcessor by lazy {
-        SequentialAnalysisOfWaldProcessor(rpnSolutionEfficientProps)
+    private val rpnProps by lazy {
+        WaldProps(
+            sigma = 0.67,
+            u1 = 0.72,
+            u0 = 0.14,
+            alpha = 0.25,
+            betta = 0.15
+        )
+    }
+
+    private val sequentialAnalysisOfWaldSolutionEfficientProcessor by lazy {
+        SequentialAnalysisOfWaldProcessor(solutionEfficientProps)
+    }
+
+    private val sequentialAnalysisOfWaldRpnProcessor by lazy {
+        SequentialAnalysisOfWaldProcessor(rpnProps)
     }
 
     private val store by lazy {
@@ -93,7 +107,8 @@ class FrontEndKtorModule : KtorModule() {
             mockProjectProvider = mockProjectProvider,
             projectAnalyzer = projectAnalyzer,
             solutionsAnalyzer = solutionsAnalyzer,
-            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldProcessor,
+            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldSolutionEfficientProcessor,
+            sequentialAnalysisOfWaldRpnProcessor = sequentialAnalysisOfWaldRpnProcessor,
             store = store
         )
     }

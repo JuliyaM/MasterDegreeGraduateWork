@@ -12,9 +12,6 @@ class SolutionsAnalyzer {
                 process.risks.map { risk -> OneRiskSolution(process, risk) }
             }
             .flatten()
-            .sortedBy {
-                it.solutionEfficient
-            }
     }
 
     fun averageRiskSolutions(projectAnalyzeResult: ProjectAnalyzeResult): List<AverageRiskSolution> {

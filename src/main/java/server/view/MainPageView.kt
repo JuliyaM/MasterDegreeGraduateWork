@@ -1,9 +1,8 @@
 package main.java.server.view
 
-import main.java.AnalyzedProject
-import main.java.AverageRiskSolution
-import main.java.SequentialAnalysisOfWaldResult
 import kotlinx.html.*
+import main.java.*
+import main.java.extentions.round
 import main.java.processors.ProjectAnalyzeResult
 import main.java.server.MyMathBundle
 import main.java.server.MyUiKitBundle
@@ -14,8 +13,10 @@ import main.java.server.view.fragments.*
 class MainPageView(
     private val project: AnalyzedProject,
     private val projectAnalyzeResult: ProjectAnalyzeResult,
-    private val waldResults: List<SequentialAnalysisOfWaldResult>,
-    private val clearedProjectVariants: List<AnalyzedProject>
+    private val solutionEfficientWaldResults: List<SequentialAnalysisOfWaldResult>,
+    private val rpnWaldResults: List<SequentialAnalysisOfWaldResult>,
+    private val clearedProjectBySolutionEfficientVariants: List<AnalyzedProject>,
+    private val clearedProjectByRpnVariants: List<AnalyzedProject>
 ) : HtmlView() {
 
     override fun getHTML(): HTML.() -> Unit =
@@ -69,18 +70,47 @@ class MainPageView(
                                 include(ResultProjectAnalyzeFragment(projectsVariants))
 
                                 p {
-                                    +"""Для выбора путей решений возьмем среднее значение показателей решений 
-|                                       для всех вариаций проекта:""".trimMargin()
-                                }
-                                include(RiskSolutionsFragment(waldResults))
-
-
-                                p {
-                                    + """Если рассмотреть ситуацию, что рекомендации будут выполненны в полном объеме
-                                        |проект получит следующую статистику:
+                                    +"""Для выбора путей решений возьмем среднее значение показателей решений для 
+                                        |всех вариаций проекта и рассмотрим принятие решений при помощи 
+                                        |последовательного алгортима Вальда основываясь на эффективности решений
                                     """.trimMargin()
                                 }
-                                include(RpnProjectFragment(clearedProjectVariants))
+
+                                include(RiskSolutionsFragment(solutionEfficientWaldResults))
+
+                                p {
+                                    +"""Для альтернативы рассмотрим принятие решений при помощи 
+                                        |последовательного алгортима Вальда основываясь на RPN
+                                    """.trimMargin()
+                                }
+
+                                include(RiskSolutionsFragment(rpnWaldResults))
+
+                                p {
+                                    +"""Если рассмотреть ситуацию, что рекомендации на основании эффективности решений 
+|                                       будут выполненны в полном объеме проект получит следующую статистику:
+                                    """.trimMargin()
+                                }
+                                p {
+                                    +"""Затрты составят: ${solutionEfficientWaldResults.acceptCost.round(2)},
+                                        |средняя эффективность решений : ${solutionEfficientWaldResults.efficient.round(2)}
+                                    """.trimMargin()
+                                }
+
+                                include(RpnProjectFragment(clearedProjectBySolutionEfficientVariants))
+
+                                p {
+                                    +"""Если рассмотреть ситуацию, что рекомендации на основании RPN 
+|                                       будут выполненны в полном объеме проект получит следующую статистику:
+                                    """.trimMargin()
+                                }
+                                p {
+                                    +"""Затрты составят: ${rpnWaldResults.acceptCost.round(2)},
+                                        |средняя эффективность решений : ${rpnWaldResults.efficient.round(2)}
+                                    """.trimMargin()
+                                }
+
+                                include(RpnProjectFragment(clearedProjectByRpnVariants))
 
                             }
                         }

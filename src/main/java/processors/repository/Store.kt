@@ -53,8 +53,12 @@ class Store {
         _waldResults += waldResults
     }
 
-    fun restoreWaldResults(solutionID: Int): SequentialAnalysisOfWaldResult? {
+    fun restoreWaldResultsBySolution(solutionID: Int): SequentialAnalysisOfWaldResult? {
         return _waldResults.find { it.solution.id == solutionID }
+    }
+
+    fun restoreWaldResultsByID(waldID: Int): SequentialAnalysisOfWaldResult? {
+        return _waldResults.find { it.id == waldID }
     }
 
 }

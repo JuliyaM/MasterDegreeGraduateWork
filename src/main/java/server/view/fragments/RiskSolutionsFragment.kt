@@ -38,9 +38,10 @@ class RiskSolutionsFragment(
                         td { +riskSolution.removedRpn.round(3).toString() }
                         td { +riskSolution.solutionEfficient.round(3).toString() }
                         td {
+                            val waldResult = waldResults[index]
                             a {
-                                href = "wald?solutionID=${riskSolution.id}"
-                                +waldResults[index].solutionDecision.russianName
+                                href = "wald?waldID=${waldResult.id}"
+                                +waldResult.solutionDecision.russianName
                             }
                         }
                     }

@@ -2,13 +2,10 @@ package main.java.server.controllers
 
 import io.ktor.application.call
 import io.ktor.html.respondHtml
-import io.ktor.http.HttpStatusCode
-import io.ktor.response.respond
 import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
-import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.repository.Store
 import main.java.server.view.WaldPageView
 
@@ -20,9 +17,9 @@ class WaldPageController(
 
     override fun createFormRouting(): Route.() -> Unit = {
         get(routingPath) {
-            val solutionID = call.request.queryParameters["solutionID"]?.toIntOrNull()
+            val waldID = call.request.queryParameters["waldID"]?.toIntOrNull()
                 ?: return@get call.respondRedirect("/main")
-            val analysisOfWaldResult = store.restoreWaldResults(solutionID)
+            val analysisOfWaldResult = store.restoreWaldResultsByID(waldID)
                 ?: return@get call.respondRedirect("/main")
 
             call.respondHtml(

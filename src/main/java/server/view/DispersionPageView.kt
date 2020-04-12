@@ -64,8 +64,8 @@ class DispersionPageView(
 
                             val countOfUniqueMap = roundedValues.groupBy { it }.mapValues { it.value.count() }
 
-                            val lowerBorder = roundedValues[(roundedValues.size * 0.25).roundToInt()]
-                            val upperBorder = roundedValues[(roundedValues.size * 0.85).roundToInt()]
+                            val lowerBorder = roundedValues[(roundedValues.size * 0.175).roundToInt()]
+                            val upperBorder = roundedValues[(roundedValues.size * 0.675).roundToInt()]
 
                             p {
                                 +"Треть элементов меньше $lowerBorder, треть элементов больше $upperBorder"

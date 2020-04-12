@@ -1,6 +1,8 @@
 package main.java
 
 import koma.matrix.Matrix
+import main.java.extentions.average
+import main.java.extentions.round
 
 data class RiskCause(
     val name: String,
@@ -78,6 +80,23 @@ data class AnalyzedProject(
         val startLabors = processes.filterIndexed { index, _ -> index != endProjectIndex }.map { it.labor }
         val endProjectIndex = endProjectIndex
         return ProjectSolveStartInfo(startMatrix, startLabors, endProjectIndex)
+    }
+
+    fun clearBy(solutionEfficientWaldResults: List<SequentialAnalysisOfWaldResult>): AnalyzedProject {
+        return copy(processes = processes
+            .map { process ->
+                val clearedRisks = process.risks.mapNotNull { risk ->
+                    when (solutionEfficientWaldResults.find { it.solution.risk.id == risk.id }?.solutionDecision) {
+                        SolutionDecision.NONE -> risk
+                        SolutionDecision.ACCEPT -> null
+                        SolutionDecision.DECLINE -> risk
+                        null -> throw Exception("no decision")
+                    }
+                }
+
+                //normalize weights
+                process.copy(risks = clearedRisks)
+            })
     }
 
     companion object {
@@ -168,25 +187,13 @@ class AverageRiskSolution(val riskSolutions: List<OneRiskSolution>, override val
     }
 }
 
-class RpnSolutionEfficientProps(
-    override val sigma: Double,
-    val upperRpnSolutionEfficientBound: Double,
-    val lowerRpnSolutionEfficientBound: Double,
-    override val alpha: Double,
-    override val betta: Double
-) : WaldProps {
-    override val u1: Double = upperRpnSolutionEfficientBound
-    override val u0: Double = lowerRpnSolutionEfficientBound
-
-}
-
-interface WaldProps {
-    val sigma: Double
-    val u1: Double
-    val u0: Double
-    val alpha: Double
+data class WaldProps(
+    val sigma: Double,
+    val u1: Double,
+    val u0: Double,
+    val alpha: Double,
     val betta: Double
-}
+)
 
 enum class SolutionDecision(val russianName: String) {
     NONE("недостаточно наблюдений"),
@@ -207,3 +214,11 @@ data class SequentialAnalysisOfWaldResult(
         private var ID = 0
     }
 }
+
+val List<SequentialAnalysisOfWaldResult>.acceptCost
+    get() = this.filter { it.solutionDecision == SolutionDecision.ACCEPT }
+        .sumByDouble { it.solution.solutionCost }
+
+val List<SequentialAnalysisOfWaldResult>.efficient
+    get() = this.filter { it.solutionDecision == SolutionDecision.ACCEPT }
+        .average { it.solution.removedRpn * 100 / it.solution.solutionCost }

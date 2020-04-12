@@ -6,7 +6,6 @@ import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
-import main.java.SolutionDecision
 import main.java.processors.ProjectAnalyzer
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
@@ -21,6 +20,7 @@ class MainPageController(
     private val projectAnalyzer: ProjectAnalyzer,
     private val solutionsAnalyzer: SolutionsAnalyzer,
     private val sequentialAnalysisOfWaldProcessor: SequentialAnalysisOfWaldProcessor,
+    private val sequentialAnalysisOfWaldRpnProcessor: SequentialAnalysisOfWaldProcessor,
     private val store: Store
 ) : RoutingController(routingPath, minimalPermission) {
 
@@ -46,36 +46,42 @@ class MainPageController(
 
             store.saveAverageRiskSolutions(averageRiskSolutions)
 
-            val waldResults = averageRiskSolutions.map {
-                sequentialAnalysisOfWaldProcessor.analyze(it.riskSolutions)
-            }
+            val solutionEfficientWaldResults = averageRiskSolutions
+                .map {
+                    sequentialAnalysisOfWaldProcessor.analyze(it.riskSolutions) { riskSolution -> riskSolution.solutionEfficient }
+                }
+                .sortedBy {
+                    it.solution.solutionEfficient
+                }
 
-            store.saveWaldResults(waldResults)
+            store.saveWaldResults(solutionEfficientWaldResults)
 
+            val rpnWaldResults = averageRiskSolutions
+                .map {
+                    sequentialAnalysisOfWaldRpnProcessor.analyze(it.riskSolutions) { riskSolution -> riskSolution.removedRpn }
+                }
+                .sortedBy {
+                    it.solution.removedRpn
+                }
 
-            val clearedProjectVariants = projectAnalyzer.getProjectVariants(
-                project.copy(processes = project.processes
-                    .map { process ->
-                        val clearedRisks = process.risks.mapNotNull { risk ->
-                            when (waldResults.find { it.solution.risk.id == risk.id }?.solutionDecision) {
-                                SolutionDecision.NONE -> risk
-                                SolutionDecision.ACCEPT -> null
-                                SolutionDecision.DECLINE -> risk
-                                null -> throw Exception("no decision")
-                            }
-                        }
+            store.saveWaldResults(rpnWaldResults)
 
-                        //normalize weights
-                        process.copy(risks = clearedRisks)
-                    })
+            val clearedProjectBySolutionEfficientVariants = projectAnalyzer.getProjectVariants(
+                project.clearBy(solutionEfficientWaldResults)
+            )
+
+            val clearedProjectByRpnVariants = projectAnalyzer.getProjectVariants(
+                project.clearBy(rpnWaldResults)
             )
 
             call.respondHtml(
                 block = MainPageView(
                     project = project,
-                    clearedProjectVariants = clearedProjectVariants,
+                    clearedProjectBySolutionEfficientVariants = clearedProjectBySolutionEfficientVariants,
+                    clearedProjectByRpnVariants = clearedProjectByRpnVariants,
                     projectAnalyzeResult = projectAnalyzeResult,
-                    waldResults = waldResults
+                    solutionEfficientWaldResults = solutionEfficientWaldResults,
+                    rpnWaldResults = rpnWaldResults
                 ).getHTML()
             )
         }

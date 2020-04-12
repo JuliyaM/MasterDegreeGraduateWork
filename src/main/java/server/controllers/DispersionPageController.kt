@@ -25,7 +25,7 @@ class DispersionPageController(
             val xi = (0..count)
                 .map {
                     mockProcessesProvider.randomProcess().withWeight(Random.nextDouble()).let { process ->
-                        process.risks.map { risk -> OneRiskSolution(process, risk) }.map { it.solutionEfficient }
+                        process.risks.map { risk -> OneRiskSolution(process, risk) }.map { it.removedRpn }
                     }
                 }
                 .flatten()

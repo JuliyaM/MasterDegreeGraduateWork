@@ -13,12 +13,15 @@ data class SequentialAnalysisOfWaldProcessor(
 ) {
 
 
-    fun analyze(riskSolutions: List<OneRiskSolution>): SequentialAnalysisOfWaldResult {
+    inline fun analyze(
+        riskSolutions: List<OneRiskSolution>,
+        getParam: (OneRiskSolution) -> Double
+    ): SequentialAnalysisOfWaldResult {
         val (aiList, riList) = processWaldProps(riskSolutions.size, waldProps)
 
 
         val cumulativeEfficient =
-            riskSolutions.map { it.solutionEfficient }.reductions(0.0) { d0, d1 -> d0 + d1 }.toList()
+            riskSolutions.map(getParam).reductions(0.0) { d0, d1 -> d0 + d1 }.toList()
 
 
         val result = cumulativeEfficient.withIndex().find { (index, efficient) ->
