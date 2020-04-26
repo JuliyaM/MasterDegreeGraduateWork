@@ -38,7 +38,7 @@ class PredictionPageView(
                                 }
                             }
 
-                            val processData = projectStructurePrediction.riskModel.data
+                            val processData = projectStructurePrediction.fullModel.data
                             val risksData = processData.map { it.data }.flatten()
                             val riskCauseData = risksData.map { it.data }.flatten()
                             val riskNames = risksData.map { it.key }.distinct()

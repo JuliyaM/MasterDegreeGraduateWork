@@ -5,7 +5,7 @@ import main.java.prediction.PredictionModel.Companion.buildModel
 
 class ProjectStructurePrediction {
 
-    val riskModel =
+    val fullModel =
         buildModel {
             anyProcess {
                 risk(VIOLATION_PROJECT_TIME_PLAN) {

@@ -22,7 +22,7 @@ import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
 import main.java.server.ktorModuleLibrary.modules.KtorModule
 import main.java.processors.repository.MockProcessesProvider
-import main.java.processors.repository.MockProjectsProvider
+import main.java.processors.repository.ProjectsProvider
 import main.java.processors.repository.MockRiskCauseProvider
 import main.java.processors.repository.MockRiskProvider
 import main.java.processors.repository.Store
@@ -55,7 +55,7 @@ class FrontEndKtorModule : KtorModule() {
     }
 
     private val mockProjectProvider by lazy {
-        MockProjectsProvider(mockProcessesProvider)
+        ProjectsProvider(mockProcessesProvider)
     }
 
     private val projectAnalyzer by lazy {
@@ -102,7 +102,20 @@ class FrontEndKtorModule : KtorModule() {
         MainPageController(
             routingPath = "main",
             minimalPermission = 0,
-            mockProjectProvider = mockProjectProvider,
+            projectProvider = mockProjectProvider,
+            projectAnalyzer = projectAnalyzer,
+            solutionsAnalyzer = solutionsAnalyzer,
+            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldSolutionEfficientProcessor,
+            sequentialAnalysisOfWaldRpnProcessor = sequentialAnalysisOfWaldRpnProcessor,
+            store = store
+        )
+    }
+
+    private val testProjectController by lazy {
+        TestProjectController(
+            routingPath = "test",
+            minimalPermission = 0,
+            projectProvider = mockProjectProvider,
             projectAnalyzer = projectAnalyzer,
             solutionsAnalyzer = solutionsAnalyzer,
             sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldSolutionEfficientProcessor,
@@ -157,6 +170,7 @@ class FrontEndKtorModule : KtorModule() {
                 routing {
                     include(staticRecursiveRoutingController)
                     include(mainPageController)
+                    include(testProjectController)
                     include(dispersionController)
                     include(predictionPageController)
                     include(waldPageController)

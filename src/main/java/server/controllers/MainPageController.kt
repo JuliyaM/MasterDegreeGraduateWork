@@ -11,13 +11,13 @@ import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
 import main.java.processors.repository.Store
 import main.java.server.view.MainPageView
-import main.java.processors.repository.MockProjectsProvider
+import main.java.processors.repository.ProjectsProvider
 import kotlin.random.Random
 
 class MainPageController(
     routingPath: String,
     minimalPermission: Int,
-    private val mockProjectProvider: MockProjectsProvider,
+    private val projectProvider: ProjectsProvider,
     private val projectAnalyzer: ProjectAnalyzer,
     private val solutionsAnalyzer: SolutionsAnalyzer,
     private val sequentialAnalysisOfWaldProcessor: SequentialAnalysisOfWaldProcessor,
@@ -31,7 +31,7 @@ class MainPageController(
             val processCount = call.request.queryParameters["processCount"]?.toIntOrNull()
             val restoredProject = projectID?.let { store.restoreProject(it) }
             val project = restoredProject ?: run {
-            val randomProject = mockProjectProvider.randomProject(processCount ?: Random.nextInt(3, 10))
+            val randomProject = projectProvider.randomProject(processCount ?: Random.nextInt(3, 10))
                 store.saveProject(randomProject)
                 randomProject
             }

@@ -1,6 +1,7 @@
 package main.java.processors.repository
 
 import main.java.RiskCause
+import main.java.prediction.PredictionRiskCauseModel
 import kotlin.random.Random
 
 class MockRiskCauseProvider {
@@ -15,6 +16,16 @@ class MockRiskCauseProvider {
     fun randomRiskCause() =
         RiskCause(
             name = randomNames.random(),
+            probability = Random.nextDouble(),
+            detectability = Random.nextDouble(),
+            significance = Random.nextDouble(1.0,11.0),
+            weight = Random.nextDouble(),
+            solutionCost = Random.nextDouble(1.0,11.0)
+        )
+
+    fun predictionRiskCause(predictionRiskCauseModel: PredictionRiskCauseModel) =
+        RiskCause(
+            name = predictionRiskCauseModel.key,
             probability = Random.nextDouble(),
             detectability = Random.nextDouble(),
             significance = Random.nextDouble(1.0,11.0),
