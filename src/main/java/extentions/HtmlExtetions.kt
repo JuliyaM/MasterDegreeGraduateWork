@@ -76,7 +76,8 @@ data class OneChartInfo(
 fun FlowContent.chartTag(
     labels: List<Any>,
     oneChartInfos: Iterable<OneChartInfo>,
-    chartType: ChartType = ChartType.LINE
+    chartType: ChartType = ChartType.LINE,
+    startFromZero: Boolean = false
 ) {
     val chardID = "myChart${Random.nextInt(100000)}"
 
@@ -108,7 +109,19 @@ fun FlowContent.chartTag(
             }
             }]
                   },
-                  options: {}
+                  options: {
+                    ${if (!startFromZero) ""
+            else """
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                """.trimIndent()
+            }
+                  }
                 }); 
                     """)
         }

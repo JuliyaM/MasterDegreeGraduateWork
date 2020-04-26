@@ -1,7 +1,7 @@
 package main.java.server.ktorModuleLibrary.kotlinHtmlExtentions
 
 import kotlinx.html.*
-import ktorModuleLibrary.ktorHtmlExtentions.produceForm
+import main.java.server.ktorModuleLibrary.ktorHtmlExtentions.produceForm
 
 
 abstract class HtmlProduceView<User>(

@@ -1,10 +1,12 @@
 package main.java.processors.solvers
 
+import koma.extensions.get
 import main.java.AnalyzedProject
 import main.java.DeltaResult
 import main.java.extentions.average
 import main.java.extentions.averageResult
 import koma.extensions.map
+import koma.extensions.mapIndexed
 import koma.matrix.Matrix
 import processors.solvers.AvgExperimentSolver
 import processors.solvers.DifferentialKolmogorovSolver
@@ -13,7 +15,6 @@ import kotlin.math.absoluteValue
 data class WithEndProcessWeightSolveResult(
     val processResultWeights: List<Double>,
     val dropEndMatrix: Matrix<Double>,
-    val normalizedDropEndMatrix: Matrix<Double>,
     val resultKolmogorovDropEnd: List<Double>,
     val dropEndMatrixPow2: Matrix<Double>,
     val multiKolmogorovResult: List<Pair<Matrix<Double>, List<Double>>>,
@@ -63,15 +64,14 @@ class ProcessWeightSolver(
         val endProjectIndex = project.endProjectIndex ?: error("Project without end")
 
         val idxs = (0 until projectMatrix.numRows()).filter { it != endProjectIndex }.toIntArray()
-        val dropEndMatrix = projectMatrix.selectRows(*idxs).selectCols(*idxs)
 
-        val normilizedDropEndMatrix = dropEndMatrix.mapRows { row -> row.map { it / row.elementSum() } }
+        val dropEndMatrix = projectMatrix.mapIndexed { row, col, ele -> if(row == col) ele + projectMatrix[row,endProjectIndex] else ele }.selectRows(*idxs).selectCols(*idxs)
 
-        val resultKolmogorovDropEnd = differentialKolmogorovSolver.solve(normilizedDropEndMatrix).toList()
+        val resultKolmogorovDropEnd = differentialKolmogorovSolver.solve(dropEndMatrix).toList()
 
-        val dropEndMatrixpow2 = normilizedDropEndMatrix.pow(2)
-        val multiKolmogorovResult = (0 until normilizedDropEndMatrix.numRows()).map {
-            val Pi = dropEndMatrixpow2.copy().apply { setRow(it, normilizedDropEndMatrix.getRow(it)) }
+        val dropEndMatrixpow2 = dropEndMatrix.pow(2)
+        val multiKolmogorovResult = (0 until dropEndMatrix.numRows()).map {
+            val Pi = dropEndMatrixpow2.copy().apply { setRow(it, dropEndMatrix.getRow(it)) }
             val resultI = differentialKolmogorovSolver.solve(Pi).toList()
 
             Pi to resultI
@@ -111,7 +111,6 @@ class ProcessWeightSolver(
             endProjectToKolmogorovDelta = endProjectToKolmogorovDelta,
             processResultWeights = kolmogorovResultWeights,
             dropEndMatrix = dropEndMatrix,
-            normalizedDropEndMatrix = normilizedDropEndMatrix,
             resultKolmogorovDropEnd = resultKolmogorovDropEnd,
             dropEndMatrixPow2 = dropEndMatrixpow2,
             multiKolmogorovResult = multiKolmogorovResult

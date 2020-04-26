@@ -4,7 +4,7 @@ import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HeadDependencies
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
 import kotlinx.css.*
 import kotlinx.html.*
-import ktorModuleLibrary.ktorHtmlExtentions.styleCss
+import main.java.server.ktorModuleLibrary.ktorHtmlExtentions.styleCss
 
 
 object MySupportBundle : HeadDependencies {

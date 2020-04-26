@@ -6,6 +6,7 @@ import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
+import main.java.prediction.ProjectStructurePrediction
 import main.java.processors.ProjectAnalyzer
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
@@ -14,39 +15,22 @@ import main.java.server.view.MainPageView
 import main.java.processors.repository.MockProjectsProvider
 import kotlin.random.Random
 
-class MainPageController(
+class TestProjectController(
     routingPath: String,
     minimalPermission: Int,
     private val mockProjectProvider: MockProjectsProvider,
     private val projectAnalyzer: ProjectAnalyzer,
     private val solutionsAnalyzer: SolutionsAnalyzer,
     private val sequentialAnalysisOfWaldProcessor: SequentialAnalysisOfWaldProcessor,
-    private val sequentialAnalysisOfWaldRpnProcessor: SequentialAnalysisOfWaldProcessor,
-    private val store: Store
+    private val prediction: ProjectStructurePrediction,
+    private val sequentialAnalysisOfWaldRpnProcessor: SequentialAnalysisOfWaldProcessor
 ) : RoutingController(routingPath, minimalPermission) {
 
     override fun createFormRouting(): Route.() -> Unit = {
         get(routingPath) {
-            val projectID = call.request.queryParameters["projectID"]?.toIntOrNull()
-            val processCount = call.request.queryParameters["processCount"]?.toIntOrNull()
-            val restoredProject = projectID?.let { store.restoreProject(it) }
-            val project = restoredProject ?: run {
-            val randomProject = mockProjectProvider.randomProject(processCount ?: Random.nextInt(3, 10))
-                store.saveProject(randomProject)
-                randomProject
-            }
-            if (restoredProject == null) return@get call.respondRedirect {
-                this.parameters["projectID"] = project.id.toString()
-            }
-            val projectAnalyzeResult = store.restoreProjectAnalyzeResult(project.id) ?: run {
-                val analyze = projectAnalyzer.analyze(project)
-                store.saveProjectAnalyzeResult(project, analyze)
-                analyze
-            }
-
+            val project = mockProjectProvider.randomProject(3)
+            val projectAnalyzeResult = projectAnalyzer.analyze(project)
             val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult)
-
-            store.saveAverageRiskSolutions(averageRiskSolutions)
 
             val solutionEfficientWaldResults = averageRiskSolutions
                 .map {
@@ -56,8 +40,6 @@ class MainPageController(
                     it.solution.solutionEfficient
                 }
 
-            store.saveWaldResults(solutionEfficientWaldResults)
-
             val rpnWaldResults = averageRiskSolutions
                 .map {
                     sequentialAnalysisOfWaldRpnProcessor.analyze(it.riskSolutions) { riskSolution -> riskSolution.removedRpn }
@@ -65,8 +47,6 @@ class MainPageController(
                 .sortedBy {
                     it.solution.removedRpn
                 }
-
-            store.saveWaldResults(rpnWaldResults)
 
             val clearedProjectBySolutionEfficientVariants = projectAnalyzer.getProjectVariants(
                 project.clearBy(solutionEfficientWaldResults)

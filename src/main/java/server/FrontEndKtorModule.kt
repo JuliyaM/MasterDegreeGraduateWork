@@ -14,21 +14,19 @@ import io.ktor.routing.routing
 import io.ktor.util.KtorExperimentalAPI
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.runBlocking
-import ktorModuleLibrary.ktorHtmlExtentions.include
+import main.java.server.ktorModuleLibrary.ktorHtmlExtentions.include
 import main.java.WaldProps
+import main.java.prediction.ProjectStructurePrediction
 import main.java.processors.ProjectAnalyzer
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
-import main.java.server.controllers.MainPageController
-import main.java.server.controllers.StaticRecursiveRoutingController
 import main.java.server.ktorModuleLibrary.modules.KtorModule
-import processors.repository.MockProcessesProvider
+import main.java.processors.repository.MockProcessesProvider
 import main.java.processors.repository.MockProjectsProvider
-import processors.repository.MockRiskCauseProvider
+import main.java.processors.repository.MockRiskCauseProvider
 import main.java.processors.repository.MockRiskProvider
 import main.java.processors.repository.Store
-import main.java.server.controllers.DispersionPageController
-import main.java.server.controllers.WaldPageController
+import main.java.server.controllers.*
 
 const val PRODUCTION = false
 
@@ -129,6 +127,18 @@ class FrontEndKtorModule : KtorModule() {
         )
     }
 
+    private val projectStructurePrediction by lazy {
+        ProjectStructurePrediction()
+    }
+
+    private val predictionPageController by lazy {
+        PredictionPageController(
+            routingPath = "prediction",
+            minimalPermission = 0,
+            projectStructurePrediction = projectStructurePrediction
+        )
+    }
+
     @KtorExperimentalAPI
     override fun initializeModule(coroutineScope: CoroutineScope): Application.() -> Unit {
 
@@ -148,6 +158,7 @@ class FrontEndKtorModule : KtorModule() {
                     include(staticRecursiveRoutingController)
                     include(mainPageController)
                     include(dispersionController)
+                    include(predictionPageController)
                     include(waldPageController)
                 }
 

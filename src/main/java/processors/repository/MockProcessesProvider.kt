@@ -1,7 +1,6 @@
-package processors.repository
+package main.java.processors.repository
 
 import main.java.AnalyzedProcess
-import main.java.processors.repository.MockRiskProvider
 import kotlin.random.Random
 
 class MockProcessesProvider(
@@ -35,3 +34,4 @@ class MockProcessesProvider(
         )
     }
 }
+

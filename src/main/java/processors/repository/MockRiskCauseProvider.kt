@@ -1,4 +1,4 @@
-package processors.repository
+package main.java.processors.repository
 
 import main.java.RiskCause
 import kotlin.random.Random

@@ -1,10 +1,11 @@
-package ktorModuleLibrary.ktorHtmlExtentions
+package main.java.server.ktorModuleLibrary.ktorHtmlExtentions
 
 import io.ktor.http.ContentType
 import io.ktor.routing.Route
 import kotlinx.css.CSSBuilder
 import kotlinx.css.Color
 import kotlinx.html.*
+import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlInputData
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.createInputFromEntry
 
@@ -14,6 +15,11 @@ fun FlowOrMetaDataContent.styleCss(builder: CSSBuilder.() -> Unit) {
         +CSSBuilder().apply(builder).toString()
     }
 }
+
+fun CommonAttributeGroupFacade.innerStyle(builder: CSSBuilder.() -> Unit) {
+    this.style = CSSBuilder().apply(builder).toString()
+}
+
 
 fun Route.include(routingController: RoutingController) {
     routingController.createFormRouting()()

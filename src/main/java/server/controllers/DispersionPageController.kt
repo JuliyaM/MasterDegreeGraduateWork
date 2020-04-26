@@ -8,7 +8,7 @@ import io.ktor.routing.get
 import koma.pow
 import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
 import main.java.server.view.DispersionPageView
-import processors.repository.MockProcessesProvider
+import main.java.processors.repository.MockProcessesProvider
 import kotlin.random.Random
 
 class DispersionPageController(

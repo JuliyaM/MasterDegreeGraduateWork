@@ -69,13 +69,7 @@ class ProjectWithEndFingWeightsAlgorithmFragment(
             }
 
             matrixTag(dropEndMatrix.round(2), "P1", "p")
-            p {
-                +"Данную матрицу необходимо нормировать:"
-            }
-
-
-            matrixTag(normalizedDropEndMatrix.round(2), "P1".withIndexLatex("normalized"), "p")
-            markovChainTag(normalizedDropEndMatrix)
+           
             p { +"Решим систему дифферциальных уравнений маркова:" }
             arrayTag(resultKolmogorovDropEnd.map { it.round(2).absoluteValue }, "q")
 

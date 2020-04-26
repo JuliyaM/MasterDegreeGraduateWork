@@ -2,7 +2,7 @@ package main.java
 
 import koma.matrix.Matrix
 import main.java.extentions.average
-import main.java.extentions.round
+import kotlin.random.Random
 
 data class RiskCause(
     val name: String,
@@ -222,3 +222,14 @@ val List<SequentialAnalysisOfWaldResult>.acceptCost
 val List<SequentialAnalysisOfWaldResult>.efficient
     get() = this.filter { it.solutionDecision == SolutionDecision.ACCEPT }
         .average { it.solution.removedRpn * 100 / it.solution.solutionCost }
+
+
+data class RiskCauseIdentifier(
+    val name: String
+)
+
+data class RiskIdentifier(
+    val name: String,
+    val riskCauseIdentifiers: List<RiskCauseIdentifier>
+)
+
