@@ -14,8 +14,8 @@ class SolutionsAnalyzer {
             .flatten()
     }
 
-    fun averageRiskSolutions(projectAnalyzeResult: ProjectAnalyzeResult): List<AverageRiskSolution> {
-        return projectAnalyzeResult.projectsVariants
+    fun averageRiskSolutions(projectsVariants: List<AnalyzedProject>): List<AverageRiskSolution> {
+        return projectsVariants
             .map { getSolutions(it) }
             .transpose()
             .map { AverageRiskSolution(it) }

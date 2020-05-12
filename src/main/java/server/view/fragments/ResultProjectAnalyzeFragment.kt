@@ -2,7 +2,6 @@ package main.java.server.view.fragments
 
 import main.java.AnalyzedProject
 import kotlinx.html.*
-import ktorModuleLibrary.librariesExtentions.median
 import main.java.extentions.*
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.HtmlFragment
 import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
@@ -25,7 +24,6 @@ class ResultProjectAnalyzeFragment(
                     th { +"RPN" }
                     th { +"Причина появления риска" }
                     th { +"RPN" }
-                    th { +"Вес причины" }
                     th { +"Вероятность появления" }
                     th { +"Вероятность обнаружения" }
                     th { +"Значимость" }
@@ -45,7 +43,7 @@ class ResultProjectAnalyzeFragment(
                         tr {
                             td {
                                 rowSpan = riskCauseCount.toString()
-                                +risk.name
+                                +risk.riskTitle
                             }
                             td {
                                 rowSpan = riskCauseCount.toString()

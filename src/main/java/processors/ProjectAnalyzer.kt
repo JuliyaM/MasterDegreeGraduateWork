@@ -78,7 +78,7 @@ class ProjectAnalyzer {
         )
     }
 
-    private fun getProjectVariants(
+    fun getProjectVariants(
         startLabors: List<Int>,
         startMatrix: Matrix<Double>,
         startProject: AnalyzedProject,

@@ -29,8 +29,8 @@ class RiskCauseSolutionsFragment(
                     tr {
                         td { +index.toString() }
                         td { +riskCauseSolution.process.name }
-                        td { +riskCauseSolution.risk.name }
-                        td { +riskCauseSolution.riskCause.name }
+                        td { +riskCauseSolution.risk.riskTitle }
+                        td { +riskCauseSolution.riskCause.causeTitle }
                         td { +riskCauseSolution.removedRpn.round(3).toString() }
                         td { +riskCauseSolution.solutionEfficient.round(3).toString() }
                     }

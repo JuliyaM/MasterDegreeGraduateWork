@@ -5,14 +5,13 @@ import main.java.extentions.average
 import kotlin.random.Random
 
 data class RiskCause(
-    val name: String,
+    val causeTitle: String,
     val probability: Double,
     val detectability: Double,
     val significance: Double,
-    val solutionCost: Double,
-    val weight: Double
+    val solutionCost: Double
 ) {
-    val rpn: Double = detectability * probability * significance * weight
+    val rpn: Double = detectability * probability * significance
 
     val id = ID++
 
@@ -22,7 +21,7 @@ data class RiskCause(
 }
 
 data class Risk(
-    val name: String,
+    val riskTitle: String,
     val riskCauses: List<RiskCause>
 ) {
     val rpn: Double = riskCauses.sumByDouble { it.rpn }

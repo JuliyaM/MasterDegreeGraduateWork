@@ -199,13 +199,10 @@ fun TR.project(
 
 fun TR.riskCause(riskCause: RiskCause) {
     td {
-        +riskCause.name
+        +riskCause.causeTitle
     }
     td {
         +riskCause.rpn.round(2).toString()
-    }
-    td {
-        +(riskCause.weight).round(2).toString()
     }
     td {
         +riskCause.probability.round(2).toString()

@@ -56,16 +56,19 @@ class ProcessWeightSolver(
         )
     }
 
-    fun getProjectWithEndProcessWeights(
+    fun kolmogorovResultWeights(
         projectMatrix: Matrix<Double>,
         project: AnalyzedProject
-    ): WithEndProcessWeightSolveResult {
+    ): KolmogorovResultWeightsResponse {
         val startProcessIndex = project.startProcessIndex
+
         val endProjectIndex = project.endProjectIndex ?: error("Project without end")
 
         val idxs = (0 until projectMatrix.numRows()).filter { it != endProjectIndex }.toIntArray()
 
-        val dropEndMatrix = projectMatrix.mapIndexed { row, col, ele -> if(row == col) ele + projectMatrix[row,endProjectIndex] else ele }.selectRows(*idxs).selectCols(*idxs)
+        val dropEndMatrix =
+            projectMatrix.mapIndexed { row, col, ele -> if (row == col) ele + projectMatrix[row, endProjectIndex] else ele }
+                .selectRows(*idxs).selectCols(*idxs)
 
         val resultKolmogorovDropEnd = differentialKolmogorovSolver.solve(dropEndMatrix).toList()
 
@@ -77,7 +80,30 @@ class ProcessWeightSolver(
             Pi to resultI
         }
 
-        val kolmogorovResultWeights = multiKolmogorovResult[startProcessIndex].second
+        return KolmogorovResultWeightsResponse(
+            dropEndMatrix = dropEndMatrix,
+            resultKolmogorovDropEnd = resultKolmogorovDropEnd,
+            dropEndMatrixPow2 = dropEndMatrixpow2,
+            multiKolmogorovResult = multiKolmogorovResult,
+            kolmogorovResultWeights = multiKolmogorovResult[startProcessIndex].second
+        )
+    }
+
+    data class KolmogorovResultWeightsResponse(
+        val dropEndMatrix: Matrix<Double>,
+        val resultKolmogorovDropEnd: List<Double>,
+        val dropEndMatrixPow2: Matrix<Double>,
+        val multiKolmogorovResult: List<Pair<Matrix<Double>, List<Double>>>,
+        val kolmogorovResultWeights: List<Double>
+    )
+
+    fun getProjectWithEndProcessWeights(
+        projectMatrix: Matrix<Double>,
+        project: AnalyzedProject
+    ): WithEndProcessWeightSolveResult {
+        val resultWeightsResponse = kolmogorovResultWeights(projectMatrix, project)
+
+        val endProjectIndex = project.endProjectIndex ?: error("Project without end")
 
         val endProjectExpCount = 1000
         val endProjectResultList =
@@ -88,6 +114,9 @@ class ProcessWeightSolver(
             averageResult = endProjectResultList.map { it.averageResult }.averageResult(),
             averageDayCount = endProjectResultList.average { it.averageDayCount }
         )
+
+        val multiKolmogorovResult = resultWeightsResponse.multiKolmogorovResult
+        val resultKolmogorovDropEnd = resultWeightsResponse.resultKolmogorovDropEnd
 
         val endProjectToKolmogorovDelta = endProjectResultList.mapIndexed { i, endProjectI ->
             val kolmogorovI = multiKolmogorovResult[i].second
@@ -109,10 +138,10 @@ class ProcessWeightSolver(
             endProjectResultList = endProjectResultList,
             endProjectResultListAverage = endProjectResultListAverage,
             endProjectToKolmogorovDelta = endProjectToKolmogorovDelta,
-            processResultWeights = kolmogorovResultWeights,
-            dropEndMatrix = dropEndMatrix,
+            processResultWeights = resultWeightsResponse.kolmogorovResultWeights,
+            dropEndMatrix = resultWeightsResponse.dropEndMatrix,
             resultKolmogorovDropEnd = resultKolmogorovDropEnd,
-            dropEndMatrixPow2 = dropEndMatrixpow2,
+            dropEndMatrixPow2 = resultWeightsResponse.dropEndMatrixPow2,
             multiKolmogorovResult = multiKolmogorovResult
         )
     }

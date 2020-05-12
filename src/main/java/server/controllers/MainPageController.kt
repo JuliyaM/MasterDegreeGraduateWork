@@ -44,7 +44,7 @@ class MainPageController(
                 analyze
             }
 
-            val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult)
+            val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult.projectsVariants)
 
             store.saveAverageRiskSolutions(averageRiskSolutions)
 

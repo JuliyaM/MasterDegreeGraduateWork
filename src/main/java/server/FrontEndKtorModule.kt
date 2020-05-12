@@ -68,21 +68,21 @@ class FrontEndKtorModule : KtorModule() {
 
     private val solutionEfficientProps by lazy {
         WaldProps(
-            sigma = 4.78,
-            u1 = 2.88,
-            u0 = 0.56,
-            alpha = 0.25,
-            betta = 0.15
+            sigma = 4.52,
+            u1 = 4.81,
+            u0 = 1.47,
+            alpha = 0.1,
+            betta = 0.13
         )
     }
 
     private val rpnProps by lazy {
         WaldProps(
-            sigma = 0.67,
-            u1 = 0.72,
-            u0 = 0.14,
-            alpha = 0.25,
-            betta = 0.15
+            sigma = 1.01,
+            u1 = 0.86,
+            u0 = 0.12,
+            alpha = 0.1,
+            betta = 0.13
         )
     }
 
@@ -132,11 +132,21 @@ class FrontEndKtorModule : KtorModule() {
         )
     }
 
-    private val dispersionController by lazy {
-        DispersionPageController(
-            routingPath = "dispersion",
+    private val dispersionProcessPageController by lazy {
+        DispersionProcessPageController(
+            routingPath = "dispersion/process",
             minimalPermission = 0,
             mockProcessesProvider = mockProcessesProvider
+        )
+    }
+
+    private val dispersionProjectPageController by lazy {
+        DispersionProjectPageController(
+            routingPath = "dispersion/project",
+            minimalPermission = 0,
+            projectsProvider = mockProjectProvider,
+            predictionModel = projectStructurePrediction.fullModel,
+            projectAnalyzer = projectAnalyzer
         )
     }
 
@@ -171,7 +181,8 @@ class FrontEndKtorModule : KtorModule() {
                     include(staticRecursiveRoutingController)
                     include(mainPageController)
                     include(testProjectController)
-                    include(dispersionController)
+                    include(dispersionProcessPageController)
+                    include(dispersionProjectPageController)
                     include(predictionPageController)
                     include(waldPageController)
                 }

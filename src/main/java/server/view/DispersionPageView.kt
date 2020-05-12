@@ -10,7 +10,7 @@ import main.java.server.ktorModuleLibrary.kotlinHtmlExtentions.include
 import kotlin.math.roundToInt
 
 class DispersionPageView(
-    private val dispersion: Double,
+    private val sigma: Double,
     private val xi: List<Double>,
     private val processCount: Int
 ) : HtmlView() {
@@ -53,12 +53,7 @@ class DispersionPageView(
                                   равномерная $$ p_i = 1 / ${xi.size} $$. Расчитаем дисперсию: """.trimMargin()
                             }
 
-                            latexExpTag(
-                                """D(X) = \sum_{i=1}^{${xi.size}} x^2_i \cdot p_i + (\sum_{i=1}^{${xi.size}} x_i \cdot p_i)^2 = ${dispersion.round(
-                                    2
-                                )}"""
-                            )
-                            latexExpTag("""\sigma = \sqrt{D(X)} = ${sqrt(dispersion).round(2)}""")
+                            latexExpTag("""\sigma = ${sigma.round(2)}""")
 
                             val roundedValues = xi.map { it.round(2) }.sorted()
 

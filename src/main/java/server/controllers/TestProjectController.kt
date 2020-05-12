@@ -92,7 +92,7 @@ class TestProjectController(
 
             val project = projectProvider.predictionProjectProvider(model.data)
             val projectAnalyzeResult = projectAnalyzer.analyze(project)
-            val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult)
+            val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult.projectsVariants)
 
             val solutionEfficientWaldResults = averageRiskSolutions
                 .map {

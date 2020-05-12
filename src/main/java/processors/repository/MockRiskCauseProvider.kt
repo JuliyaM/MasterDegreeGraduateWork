@@ -15,21 +15,19 @@ class MockRiskCauseProvider {
 
     fun randomRiskCause() =
         RiskCause(
-            name = randomNames.random(),
+            causeTitle = randomNames.random(),
             probability = Random.nextDouble(),
             detectability = Random.nextDouble(),
             significance = Random.nextDouble(1.0,11.0),
-            weight = Random.nextDouble(),
             solutionCost = Random.nextDouble(1.0,11.0)
         )
 
     fun predictionRiskCause(predictionRiskCauseModel: PredictionRiskCauseModel) =
         RiskCause(
-            name = predictionRiskCauseModel.key,
+            causeTitle = predictionRiskCauseModel.key,
             probability = Random.nextDouble(),
             detectability = Random.nextDouble(),
             significance = Random.nextDouble(1.0,11.0),
-            weight = Random.nextDouble(),
             solutionCost = Random.nextDouble(1.0,11.0)
         )
 }
