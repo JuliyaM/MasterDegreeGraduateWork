@@ -6,6 +6,7 @@ import io.ktor.response.respondRedirect
 import io.ktor.routing.Route
 import io.ktor.routing.get
 import ktorModuleLibrary.ktorHtmlExtentions.RoutingController
+import main.java.prediction.ProjectStructurePrediction
 import main.java.processors.ProjectAnalyzer
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
@@ -21,28 +22,25 @@ class MainPageController(
     private val projectAnalyzer: ProjectAnalyzer,
     private val solutionsAnalyzer: SolutionsAnalyzer,
     private val sequentialAnalysisOfWaldProcessor: SequentialAnalysisOfWaldProcessor,
-    private val sequentialAnalysisOfWaldRpnProcessor: SequentialAnalysisOfWaldProcessor,
+    private val projectStructurePrediction: ProjectStructurePrediction,
     private val store: Store
 ) : RoutingController(routingPath, minimalPermission) {
 
     override fun createFormRouting(): Route.() -> Unit = {
         get(routingPath) {
+            val processPredictions = projectStructurePrediction.fullModel.data
             val projectID = call.request.queryParameters["projectID"]?.toIntOrNull()
-            val processCount = call.request.queryParameters["processCount"]?.toIntOrNull()
+            val processCount = call.request.queryParameters["processCount"]?.toIntOrNull() ?: processPredictions.size
             val restoredProject = projectID?.let { store.restoreProject(it) }
-            val project = restoredProject ?: run {
-            val randomProject = projectProvider.randomProject(processCount ?: Random.nextInt(3, 10))
-                store.saveProject(randomProject)
-                randomProject
-            }
+            val project = restoredProject
+                ?: projectProvider.randomProject(processPredictions.take(processCount)).also { store.saveProject(it) }
+
             if (restoredProject == null) return@get call.respondRedirect {
                 this.parameters["projectID"] = project.id.toString()
             }
-            val projectAnalyzeResult = store.restoreProjectAnalyzeResult(project.id) ?: run {
-                val analyze = projectAnalyzer.analyze(project)
-                store.saveProjectAnalyzeResult(project, analyze)
-                analyze
-            }
+
+            val projectAnalyzeResult = store.restoreProjectAnalyzeResult(project.id)
+                ?: projectAnalyzer.analyze(project).also { store.saveProjectAnalyzeResult(project, it) }
 
             val averageRiskSolutions = solutionsAnalyzer.averageRiskSolutions(projectAnalyzeResult.projectsVariants)
 
@@ -58,32 +56,18 @@ class MainPageController(
 
             store.saveWaldResults(solutionEfficientWaldResults)
 
-            val rpnWaldResults = averageRiskSolutions
-                .map {
-                    sequentialAnalysisOfWaldRpnProcessor.analyze(it.riskSolutions) { riskSolution -> riskSolution.removedRpn }
-                }
-                .sortedBy {
-                    it.solution.removedRpn
-                }
-
-            store.saveWaldResults(rpnWaldResults)
 
             val clearedProjectBySolutionEfficientVariants = projectAnalyzer.getProjectVariants(
                 project.clearBy(solutionEfficientWaldResults)
             )
 
-            val clearedProjectByRpnVariants = projectAnalyzer.getProjectVariants(
-                project.clearBy(rpnWaldResults)
-            )
 
             call.respondHtml(
                 block = MainPageView(
                     project = project,
                     clearedProjectBySolutionEfficientVariants = clearedProjectBySolutionEfficientVariants,
-                    clearedProjectByRpnVariants = clearedProjectByRpnVariants,
                     projectAnalyzeResult = projectAnalyzeResult,
-                    solutionEfficientWaldResults = solutionEfficientWaldResults,
-                    rpnWaldResults = rpnWaldResults
+                    solutionEfficientWaldResults = solutionEfficientWaldResults
                 ).getHTML()
             )
         }

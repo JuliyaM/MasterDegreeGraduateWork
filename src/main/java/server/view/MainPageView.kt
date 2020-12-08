@@ -14,9 +14,7 @@ class MainPageView(
     private val project: AnalyzedProject,
     private val projectAnalyzeResult: ProjectAnalyzeResult,
     private val solutionEfficientWaldResults: List<SequentialAnalysisOfWaldResult>,
-    private val rpnWaldResults: List<SequentialAnalysisOfWaldResult>,
-    private val clearedProjectBySolutionEfficientVariants: List<AnalyzedProject>,
-    private val clearedProjectByRpnVariants: List<AnalyzedProject>
+    private val clearedProjectBySolutionEfficientVariants: List<AnalyzedProject>
 ) : HtmlView() {
 
     override fun getHTML(): HTML.() -> Unit =
@@ -79,16 +77,8 @@ class MainPageView(
                                 include(RiskSolutionsFragment(solutionEfficientWaldResults))
 
                                 p {
-                                    +"""Для альтернативы рассмотрим принятие решений при помощи 
-                                        |последовательного алгортима Вальда основываясь на RPN
-                                    """.trimMargin()
-                                }
-
-                                include(RiskSolutionsFragment(rpnWaldResults))
-
-                                p {
                                     +"""Если рассмотреть ситуацию, что рекомендации на основании эффективности решений 
-|                                       будут выполненны в полном объеме проект получит следующую статистику:
+|                                       будут выполнены в полном объеме, проект получит следующую статистику:
                                     """.trimMargin()
                                 }
                                 p {
@@ -98,20 +88,6 @@ class MainPageView(
                                 }
 
                                 include(RpnProjectFragment(clearedProjectBySolutionEfficientVariants))
-
-                                p {
-                                    +"""Если рассмотреть ситуацию, что рекомендации на основании RPN 
-|                                       будут выполненны в полном объеме проект получит следующую статистику:
-                                    """.trimMargin()
-                                }
-                                p {
-                                    +"""Затрты составят: ${rpnWaldResults.acceptCost.round(2)},
-                                        |средняя эффективность решений : ${rpnWaldResults.efficient.round(2)}
-                                    """.trimMargin()
-                                }
-
-                                include(RpnProjectFragment(clearedProjectByRpnVariants))
-
                             }
                         }
                     }

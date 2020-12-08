@@ -12,22 +12,23 @@ data class SequentialAnalysisOfWaldProcessor(
     val waldProps: WaldProps
 ) {
 
-
     inline fun analyze(
         riskSolutions: List<OneRiskSolution>,
         getParam: (OneRiskSolution) -> Double
     ): SequentialAnalysisOfWaldResult {
+        // Получаем границы анализа Вальда
         val (aiList, riList) = processWaldProps(riskSolutions.size, waldProps)
-
-
+        // Получаем значение кумулятивной (накапливаемой) эффективности решений
         val cumulativeEfficient =
-            riskSolutions.map(getParam).reductions(0.0) { d0, d1 -> d0 + d1 }.toList()
+            riskSolutions
+                .map(getParam)
+                .reductions(0.0) { d0, d1 -> d0 + d1 }.toList()
 
-
+        // Проверям удовлетворят ли последовательность
+        // одному из условия анализа Вальда
         val result = cumulativeEfficient.withIndex().find { (index, efficient) ->
             val ai = aiList[index]
             val ri = riList[index]
-
             efficient <= ai || efficient >= ri
         }
 

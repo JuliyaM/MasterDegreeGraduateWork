@@ -1,4 +1,4 @@
-package processors.solvers
+package main.java.processors.solvers
 
 import main.java.extentions.diagonalZeros
 import main.java.extentions.onesRow
@@ -9,9 +9,7 @@ import koma.matrix.Matrix
 class DifferentialKolmogorovSolver {
     fun solve(P: Matrix<Double>): Matrix<Double> {
         val P1 = P.diagonalZeros()
-        val rowSum = P1.mapRowsToList {
-            it.elementSum() * -1
-        }
+        val rowSum = P1.mapRowsToList { it.elementSum() * -1 }
 
         val P2 = P1.mapIndexed { row, col, ele ->
             if (row == col) rowSum[row]
@@ -24,3 +22,4 @@ class DifferentialKolmogorovSolver {
         return result
     }
 }
+

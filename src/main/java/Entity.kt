@@ -2,18 +2,17 @@ package main.java
 
 import koma.matrix.Matrix
 import main.java.extentions.average
-import kotlin.random.Random
 
 data class RiskCause(
     val causeTitle: String,
     val probability: Double,
     val detectability: Double,
     val significance: Double,
-    val solutionCost: Double
+    val solutionCost: Double,
+    val id: Int = ID++
 ) {
     val rpn: Double = detectability * probability * significance
 
-    val id = ID++
 
     companion object {
         private var ID = 0
@@ -22,12 +21,11 @@ data class RiskCause(
 
 data class Risk(
     val riskTitle: String,
-    val riskCauses: List<RiskCause>
+    val riskCauses: List<RiskCause>,
+    val id: Int = ID++
 ) {
     val rpn: Double = riskCauses.sumByDouble { it.rpn }
     val solutionCost: Double = riskCauses.sumByDouble { it.solutionCost }
-
-    val id = ID++
 
     companion object {
         private var ID = 0
@@ -43,6 +41,7 @@ data class AnalyzedProcess(
     val id: Int = ID++
 ) {
     val rpn: Double = risks.sumByDouble { it.rpn } * weight
+
     fun withWeight(weightValue: Double) = copy(weight = weightValue)
 
     companion object {
@@ -154,8 +153,11 @@ data class OneRiskSolution(
     override val risk: Risk,
     override val id: Int = ID++
 ) : RiskSolution {
+    // сколько RPN "удалит" решение - эффективный RPN
     override val removedRpn: Double = (risk.rpn * process.weight)
+    //стоимость решения
     override val solutionCost: Double = risk.solutionCost
+    //эффективность решения
     override val solutionEfficient: Double = removedRpn * 100 / risk.solutionCost
 
 

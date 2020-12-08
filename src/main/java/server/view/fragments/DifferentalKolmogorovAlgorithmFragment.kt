@@ -39,7 +39,8 @@ class DifferentalKolmogorovAlgorithmFragment(
 
         systemeTag(qiToInboxToOutbox.map { (qi, inbox, outBox) -> "$qi' = $inbox - $outBox" })
         p {
-            +"Так как предельные вероятности постоянны, то, заменяя в уравнениях Колмогорова их производные нулевыми значениями:"
+            +"""Так как предельные вероятности постоянны, то, заменяя в уравнениях Колмогорова
+|               их производные нулевыми значениями, получим:""".trimMargin()
         }
         systemeTag(qiToInboxToOutbox.map { (_, inbox, outBox) -> "$outBox = $inbox" })
 

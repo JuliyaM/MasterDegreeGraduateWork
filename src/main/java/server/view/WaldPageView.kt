@@ -30,7 +30,7 @@ class WaldPageView(
                         div(classes = "uk-width-1-1 uk-row-first") {
                             div(classes = "uk-text-center") {
                                 h1 {
-                                    +"Анализ вальда"
+                                    +"Анализ Вальда"
                                 }
                                 p(classes = "uk-text-lead") {
                                     +"Для решения ${waldResult.solution.id}"

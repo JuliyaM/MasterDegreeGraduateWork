@@ -30,7 +30,7 @@ class AlgorithmProjectBuildFragment(
                 val isEndState = row == endProjectIndex
                 val condition = when {
                     isEndState -> "конечное $LS состояние"
-                    row != col -> "не $LS диагональный $LS элемент"
+                    row != col -> "недиагональный $LS элемент"
                     else -> "диагональный $LS элемент"
                 }
 
@@ -42,7 +42,7 @@ class AlgorithmProjectBuildFragment(
                     else -> "1 - ${frac(1, m_row)}"
                 }
 
-                val valueOfLabor = if (!isEndState) "($m_row = $mi) $LS" else ""
+                val valueOfLabor = if (!isEndState) "($m_row = $mi) " else ""
 
                 //todo get result from constructor
                 val result = when {

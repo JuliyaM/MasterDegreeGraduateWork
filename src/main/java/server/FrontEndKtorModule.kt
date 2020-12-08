@@ -18,6 +18,7 @@ import main.java.server.ktorModuleLibrary.ktorHtmlExtentions.include
 import main.java.WaldProps
 import main.java.prediction.ProjectStructurePrediction
 import main.java.processors.ProjectAnalyzer
+import main.java.processors.ProjectLifecycleBuilder
 import main.java.processors.SequentialAnalysisOfWaldProcessor
 import main.java.processors.SolutionsAnalyzer
 import main.java.server.ktorModuleLibrary.modules.KtorModule
@@ -26,6 +27,8 @@ import main.java.processors.repository.ProjectsProvider
 import main.java.processors.repository.MockRiskCauseProvider
 import main.java.processors.repository.MockRiskProvider
 import main.java.processors.repository.Store
+import main.java.processors.solvers.DifferentialKolmogorovSolver
+import main.java.processors.solvers.EndProjectExperimentSolver
 import main.java.server.controllers.*
 
 const val PRODUCTION = false
@@ -76,22 +79,8 @@ class FrontEndKtorModule : KtorModule() {
         )
     }
 
-    private val rpnProps by lazy {
-        WaldProps(
-            sigma = 1.01,
-            u1 = 0.86,
-            u0 = 0.12,
-            alpha = 0.1,
-            betta = 0.13
-        )
-    }
-
     private val sequentialAnalysisOfWaldSolutionEfficientProcessor by lazy {
         SequentialAnalysisOfWaldProcessor(solutionEfficientProps)
-    }
-
-    private val sequentialAnalysisOfWaldRpnProcessor by lazy {
-        SequentialAnalysisOfWaldProcessor(rpnProps)
     }
 
     private val store by lazy {
@@ -106,21 +95,20 @@ class FrontEndKtorModule : KtorModule() {
             projectAnalyzer = projectAnalyzer,
             solutionsAnalyzer = solutionsAnalyzer,
             sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldSolutionEfficientProcessor,
-            sequentialAnalysisOfWaldRpnProcessor = sequentialAnalysisOfWaldRpnProcessor,
+            projectStructurePrediction = projectStructurePrediction,
             store = store
         )
     }
 
-    private val testProjectController by lazy {
-        TestProjectController(
-            routingPath = "test",
+    private val modificationAverageTestController by lazy {
+        ModificationAverageTestController(
+            routingPath = "modificationTest",
             minimalPermission = 0,
             projectProvider = mockProjectProvider,
-            projectAnalyzer = projectAnalyzer,
-            solutionsAnalyzer = solutionsAnalyzer,
-            sequentialAnalysisOfWaldProcessor = sequentialAnalysisOfWaldSolutionEfficientProcessor,
-            sequentialAnalysisOfWaldRpnProcessor = sequentialAnalysisOfWaldRpnProcessor,
-            store = store
+            kolmogorovSolver = DifferentialKolmogorovSolver(),
+            projectLifecycleBuilder = ProjectLifecycleBuilder(),
+            endProjectExperimentSolver = EndProjectExperimentSolver(),
+            projectStructurePrediction = projectStructurePrediction
         )
     }
 
@@ -132,11 +120,10 @@ class FrontEndKtorModule : KtorModule() {
         )
     }
 
-    private val dispersionProcessPageController by lazy {
-        DispersionProcessPageController(
-            routingPath = "dispersion/process",
-            minimalPermission = 0,
-            mockProcessesProvider = mockProcessesProvider
+    private val courierController by lazy {
+        CourierController(
+            routingPath = "courier",
+            minimalPermission = 0
         )
     }
 
@@ -180,11 +167,11 @@ class FrontEndKtorModule : KtorModule() {
                 routing {
                     include(staticRecursiveRoutingController)
                     include(mainPageController)
-                    include(testProjectController)
-                    include(dispersionProcessPageController)
+                    include(modificationAverageTestController)
                     include(dispersionProjectPageController)
                     include(predictionPageController)
                     include(waldPageController)
+                    include(courierController)
                 }
 
             }

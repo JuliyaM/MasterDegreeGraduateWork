@@ -7,22 +7,13 @@ import kotlin.random.Random
 class MockProcessesProvider(
     private val riskProvider: MockRiskProvider
 ) {
-    private val randomNames = listOf(
-        "Проектирование",
-        "Анализ",
-        "Разработка",
-        "Тестирование",
-        "Изучение",
-        "DataMining",
-        "DevOps"
-    )
-
-    fun randomProcess(riskCount: Int = Random.nextInt(2, 6)): AnalyzedProcess {
-        val risks = (0 until riskCount).map {
-            riskProvider.randomRisk()
+    fun randomProcess(predictionProcessModel: PredictionProcessModel): AnalyzedProcess {
+        val processKey = predictionProcessModel.key
+        val risks = predictionProcessModel.data.map {
+            riskProvider.randomRisk(it)
         }
         return AnalyzedProcess.EMPTY.copy(
-            name = randomNames.random(),
+            name = processKey.russianName,
             risks = risks,
             labor = Random.nextInt(10, 100)
         )

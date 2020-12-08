@@ -16,7 +16,7 @@ class OneSequentialAnalysisOfWaldFragment(
     override fun getFragment(): FlowContent.() -> Unit = {
         if (waldResult.resultStep != 0) {
             include(UiTableFragment(
-                tableName = "Анализ вальда решения ${waldResult.solution.id}",
+                tableName = "Анализ Вальда для  решения № ${waldResult.solution.id}",
                 tHead = {
                     tr {
                         th { +"Наблюдение" }
@@ -66,7 +66,7 @@ class OneSequentialAnalysisOfWaldFragment(
             )
         } else {
             p {
-                +"Анализ вальда решения ${waldResult.solution.id} дает ответ на первом шаге - ${waldResult.solutionDecision.russianName}"
+                +"Анализ Вальда для решения № ${waldResult.solution.id} дает ответ на первом шаге - ${waldResult.solutionDecision.russianName}"
             }
         }
     }

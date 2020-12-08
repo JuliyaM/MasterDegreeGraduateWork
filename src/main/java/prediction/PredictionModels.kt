@@ -150,9 +150,9 @@ const val HARD_UX_NO_HELP = "Высокая сложность работы пр
 
 //planing
 const val IGNORING_USER_REVIEWS = "Игнорирование обратной связи от заинтересованных сторон"
-const val BAD_MARKETING_STRATEGY = "Неправильная позицирование продукта для пользователей"
+const val BAD_MARKETING_STRATEGY = "Неправильное позицирование продукта для пользователей"
 const val NON_CONSISTENT_FUNCTIONAL_OF_DIFFERENT_PLATFORMS =
-    "Не согласованность выпускаемого функционала на разных поддерживаемых платформах"
+    "Несогласованность выпускаемого функционала на разных поддерживаемых платформах"
 
 
 @DslMarker
